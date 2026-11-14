@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101512">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="DailyForm">
+  <link rel="manifest" href="manifest.json">
+  <title>Daily Form — Fitness Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" aria-label="Daily Form home"><span class="brand-mark">D</span><span>DAILY<span class="brand-light">FORM</span></span></a>
+      <div class="side-label">YOUR SPACE</div>
+      <a class="nav-item active" href="#overview"><span>▦</span> Overview</a>
+      <a class="nav-item" href="#workouts"><span>◉</span> Today's workouts</a>
+      <a class="nav-item" href="#history"><span>↗</span> Workout history</a>
+      <div class="sidebar-bottom">
+        <div class="quote-mark">“</div>
+        <p>Consistency beats intensity when intensity isn't consistent.</p>
+        <span>KEEP SHOWING UP</span>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="topbar">
+        <div><div class="eyebrow">YOUR DAILY TRAINING LOG</div><h1>Make today count<span class="accent">.</span></h1></div>
+        <div class="date-control"><button id="prevDay" class="icon-button" aria-label="Previous day">‹</button><div><span id="dayLabel">TODAY</span><strong id="dateLabel"></strong></div><button id="nextDay" class="icon-button" aria-label="Next day">›</button><button id="todayBtn" class="today-button">Today</button></div>
+      </header>
+
+      <section class="hero-row" id="overview">
+        <div class="hero-card">
+          <div class="hero-copy"><span class="eyebrow">DAILY CHECK-IN</span><h2>Three sessions.<br><em>One stronger you.</em></h2><p>Put in the work, log your progress, and keep building momentum.</p></div>
+          <div class="hero-stat"><div class="progress-ring" id="progressRing"><div><strong id="completionCount">0/3</strong><span>COMPLETE</span></div></div><span class="ring-caption">DAILY GOAL</span></div>
+          <div class="hero-decoration">TRAIN<br>WITH<br>INTENT</div>
+        </div>
+        <div class="stat-card"><div class="stat-top"><span class="eyebrow">TOTAL TIME</span><span class="stat-icon">◷</span></div><strong id="totalMinutes">0 <small>min</small></strong><p>Time invested today</p><div class="stat-line"><span id="sessionSummary">No sessions logged yet</span></div></div>
+      </section>
+
+      <section class="section-block" id="workouts">
+        <div class="section-heading"><div><span class="eyebrow">THE DAILY THREE</span><h2>Your sessions</h2></div><span class="section-note">Log each session as you go</span></div>
+        <div class="workout-grid">
+          <article class="workout-card strength" data-type="strength">
+            <div class="workout-head"><span class="workout-number">01 / STRENGTH</span><span class="workout-symbol">↗</span></div>
+            <h3>Build strength</h3><p class="workout-desc">Lift with purpose. Record your movements and the work you put in.</p>
+            <div class="field-row"><label>Duration <div class="input-wrap"><input id="strengthDuration" type="number" min="0" placeholder="45"><span>min</span></div></label><label>Exercises <div class="input-wrap"><input id="strengthExercises" type="number" min="0" placeholder="5"><span>total</span></div></label></div>
+            <label class="full-label">What did you train?<textarea id="strengthNotes" rows="2" placeholder="e.g. Squats 3×8 · Bench 3×10 · Rows 3×12"></textarea></label>
+            <button class="complete-button" data-save="strength"><span>＋</span> Log strength session</button>
+            <div class="saved-state" id="strengthSaved">✓ Session saved</div>
+          </article>
+
+          <article class="workout-card cardio" data-type="cardio">
+            <div class="workout-head"><span class="workout-number">02 / CARDIO</span><span class="workout-symbol">⌁</span></div>
+            <h3>Build endurance</h3><p class="workout-desc">Get your heart rate up. Track your pace, distance, and effort.</p>
+            <div class="field-row"><label>Duration <div class="input-wrap"><input id="cardioDuration" type="number" min="0" placeholder="30"><span>min</span></div></label><label>Distance <div class="input-wrap"><input id="cardioDistance" type="number" min="0" step="0.01" placeholder="3.0"><span>mi</span></div></label></div>
+            <label class="full-label">Activity / notes<textarea id="cardioNotes" rows="2" placeholder="e.g. Outdoor run · steady pace · moderate effort"></textarea></label>
+            <button class="complete-button" data-save="cardio"><span>＋</span> Log cardio session</button>
+            <div class="saved-state" id="cardioSaved">✓ Session saved</div>
+          </article>
+
+          <article class="workout-card boxing" data-type="boxing">
+            <div class="workout-head"><span class="workout-number">03 / BOXING</span><span class="workout-symbol">✳</span></div>
+            <h3>Find your rhythm</h3><p class="workout-desc">Work the rounds. Capture your combinations, pace, and focus.</p>
+            <div class="field-row"><label>Duration <div class="input-wrap"><input id="boxingDuration" type="number" min="0" placeholder="30"><span>min</span></div></label><label>Rounds <div class="input-wrap"><input id="boxingRounds" type="number" min="0" placeholder="6"><span>total</span></div></label></div>
+            <label class="full-label">Focus / notes<textarea id="boxingNotes" rows="2" placeholder="e.g. Heavy bag · footwork · 3-minute rounds"></textarea></label>
+            <button class="complete-button" data-save="boxing"><span>＋</span> Log boxing session</button>
+            <div class="saved-state" id="boxingSaved">✓ Session saved</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="history-section" id="history">
+        <div class="section-heading"><div><span class="eyebrow">YOUR CONSISTENCY</span><h2>Daily activity</h2></div><span class="section-note">Saved on this device</span></div>
+        <div class="history-panel"><div id="historyList" class="history-list"><div class="empty-state"><span>◎</span><strong>Your training story starts here.</strong><p>Log a session above and it will show up here.</p></div></div></div>
+      </section>
+      <footer><span>DAILYFORM <span class="accent">/</span> PERSONAL TRAINING LOG</span><span>Your data stays in this browser.</span></footer>
+    </main>
+  </div>
+</body>
+</html>
