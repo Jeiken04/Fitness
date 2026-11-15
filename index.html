@@ -19,6 +19,8 @@
       <div class="side-label">YOUR SPACE</div>
       <a class="nav-item active" href="#overview"><span>▦</span> Overview</a>
       <a class="nav-item" href="#workouts"><span>◉</span> Today's workouts</a>
+      <a class="nav-item" href="#insights"><span>▤</span> Progress & stats</a>
+      <a class="nav-item" href="#weight-loss"><span>⚖</span> Weight loss</a>
       <a class="nav-item" href="#history"><span>↗</span> Workout history</a>
       <div class="sidebar-bottom">
         <div class="quote-mark">“</div>
@@ -72,6 +74,61 @@
             <div class="saved-state" id="boxingSaved">✓ Session saved</div>
           </article>
         </div>
+      </section>
+
+
+      <section class="section-block" id="checklist">
+        <div class="section-heading"><div><span class="eyebrow">TODAY'S PLAN</span><h2>Daily workout checklist</h2></div><span class="section-note" id="checklistCount">0 of 3 done</span></div>
+        <div class="checklist-panel" id="dailyChecklist"></div>
+      </section>
+      <section class="section-block" id="exercise-log">
+        <div class="section-heading"><div><span class="eyebrow">THE DETAILS</span><h2>Exercise logging</h2></div><span class="section-note">Track sets, reps and weight</span></div>
+        <form id="exerciseForm" class="exercise-form">
+          <label>Workout<select id="exerciseType"><option value="strength">Strength</option><option value="cardio">Cardio</option><option value="boxing">Boxing</option></select></label>
+          <label>Exercise<input id="exerciseName" maxlength="90" placeholder="e.g. Bench press" required></label>
+          <label>Sets<input id="exerciseSets" type="number" min="0" step="1" placeholder="3"></label>
+          <label>Reps<input id="exerciseReps" type="number" min="0" step="1" placeholder="10"></label>
+          <label>Weight (lb)<input id="exerciseWeight" type="number" min="0" step="0.5" placeholder="135"></label>
+          <button type="submit" class="complete-button">+ Add exercise</button>
+        </form>
+        <div id="exerciseList" class="exercise-list"></div>
+      </section>
+      <section class="section-block" id="insights">
+        <div class="section-heading"><div><span class="eyebrow">YOUR MOMENTUM</span><h2>Streaks & weekly statistics</h2></div><span class="section-note">Week starts Monday</span></div>
+        <div class="insight-grid">
+          <div class="insight-card"><span class="eyebrow">CURRENT STREAK</span><strong id="currentStreak">0 <small>days</small></strong><p>Consecutive days completing all 3 workouts</p></div>
+          <div class="insight-card"><span class="eyebrow">BEST STREAK</span><strong id="bestStreak">0 <small>days</small></strong><p>Your longest full-day training streak</p></div>
+          <div class="insight-card"><span class="eyebrow">THIS WEEK</span><strong id="weeklySessions">0 <small>sessions</small></strong><p id="weeklySessionsDelta">Compared with last week</p></div>
+          <div class="insight-card"><span class="eyebrow">TRAINING TIME</span><strong id="weeklyMinutes">0 <small>min</small></strong><p id="weeklyMinutesDelta">Compared with last week</p></div>
+          <div class="insight-card"><span class="eyebrow">ACTIVE DAYS</span><strong id="weeklyDays">0 <small>/ 7</small></strong><p>Days with at least one session this week</p></div>
+        </div>
+      </section>
+      <section class="section-block" id="calendar-section">
+        <div class="section-heading"><div><span class="eyebrow">THE BIG PICTURE</span><h2>Workout history calendar</h2></div><div class="calendar-nav"><button id="calendarPrev" class="icon-button" aria-label="Previous month">‹</button><strong id="calendarTitle"></strong><button id="calendarNext" class="icon-button" aria-label="Next month">›</button></div></div>
+        <div class="calendar-panel"><div class="calendar-grid" id="calendarGrid"></div><p class="calendar-legend"><span class="legend-dot partial"></span> 1–2 sessions <span class="legend-dot full"></span> All 3 sessions · Select a date to view its logs</p></div>
+      </section>
+
+
+      <section class="section-block" id="weight-loss">
+        <div class="section-heading"><div><span class="eyebrow">YOUR BODYWEIGHT JOURNEY</span><h2>Weight loss tracker</h2></div><span class="section-note">Track trends, not just daily changes</span></div>
+        <div class="weight-layout">
+          <div class="weight-panel">
+            <h3>Set your goal</h3><p class="weight-hint">Enter your starting weight and target weight. Choose the same unit for every entry.</p>
+            <div class="weight-fields"><label>Starting weight<input id="weightStart" type="number" min="1" step="0.1" placeholder="e.g. 200"></label><label>Goal weight<input id="weightGoal" type="number" min="1" step="0.1" placeholder="e.g. 175"></label><label>Unit<select id="weightUnit"><option value="lb">lb</option><option value="kg">kg</option></select></label></div>
+            <button class="complete-button" id="saveWeightGoal">Save goal</button>
+            <div class="weight-separator"></div>
+            <h3>Log a weigh-in</h3><p class="weight-hint">Use the date selected above or choose a different date.</p>
+            <div class="weight-fields"><label>Date<input id="weighDate" type="date"></label><label>Weight<input id="weighValue" type="number" min="1" step="0.1" placeholder="Current weight"></label></div>
+            <button class="complete-button" id="saveWeighIn">Save weigh-in</button>
+            <p id="weightMessage" class="weight-message" role="status" aria-live="polite"></p>
+          </div>
+          <div class="weight-panel">
+            <div class="weight-summary"><div><span class="eyebrow">LATEST WEIGHT</span><strong id="weightLatest">—</strong></div><div><span class="eyebrow">CHANGE FROM START</span><strong id="weightChange">—</strong></div><div><span class="eyebrow">TO GOAL</span><strong id="weightRemaining">—</strong></div></div>
+            <div class="weight-progress-head"><span>Goal progress</span><span id="weightProgressLabel">Set a goal to begin</span></div><div class="weight-progress"><div id="weightProgressBar"></div></div>
+            <h3>Weight trend</h3><div class="weight-chart" id="weightChart" aria-label="Weight trend over time"></div>
+          </div>
+        </div>
+        <div class="weight-panel weight-history-panel"><div class="section-heading"><h3>Weigh-in history</h3><span class="section-note">Most recent first</span></div><div id="weighHistory" class="weight-history"></div></div>
       </section>
 
       <section class="history-section" id="history">

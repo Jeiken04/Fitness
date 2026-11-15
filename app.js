@@ -3,6 +3,7 @@ const types = ['strength', 'cardio', 'boxing'];
 const labels = { strength: 'Strength', cardio: 'Cardio', boxing: 'Boxing' };
 let selectedDate = dateKey(new Date());
 let records = loadRecords();
+let calendarMonth = new Date(new Date().getFullYear(),new Date().getMonth(),1);
 
 function dateKey(date) {
   const d = new Date(date);
@@ -46,6 +47,11 @@ function render() {
     });
   });
   renderHistory();
+  renderChecklist();
+  renderExercises();
+  renderInsights();
+  renderCalendar();
+  renderWeight();
 }
 function logWorkout(type) {
   if (selectedDate > dateKey(new Date())) {
@@ -102,3 +108,136 @@ document.getElementById('historyList').addEventListener('click', event => {
   render();
 });
 render();
+
+
+// A saved workout, including a checklist-only entry, counts as complete.
+function renderChecklist(){
+ const data=dayData();
+ const count=types.filter(t=>Boolean(data[t])).length;
+ document.getElementById('checklistCount').textContent=`${count} of 3 done`;
+ document.getElementById('dailyChecklist').innerHTML=types.map(t=>`<label class="checklist-row ${data[t]?'checked':''}"><input type="checkbox" data-check="${t}" ${data[t]?'checked':''} ${selectedDate>dateKey(new Date())?'disabled':''}><span>${labels[t]}</span><small>${data[t]?'Completed':'Not completed'}</small></label>`).join('');
+}
+document.getElementById('dailyChecklist').addEventListener('change',e=>{
+ const type=e.target.dataset.check;if(!types.includes(type))return;
+ if(!records[selectedDate])records[selectedDate]={};
+ if(e.target.checked) records[selectedDate][type]={duration:0,metric:'',notes:'',updatedAt:new Date().toISOString()};
+ else delete records[selectedDate][type];
+ if(!Object.keys(records[selectedDate]).length)delete records[selectedDate];
+ saveRecords();render();
+});
+function renderExercises(){
+ const entries=Array.isArray(dayData().exercises)?dayData().exercises:[];
+ document.getElementById('exerciseList').innerHTML=entries.map((e,i)=>`<div class="exercise-entry"><div><strong>${escapeHTML(e.name)}</strong><small>${labels[e.type]||'Workout'}</small></div><span class="exercise-values">${e.sets||0} sets × ${e.reps||0} reps${e.weight!==''?' · '+escapeHTML(String(e.weight))+' lb':''}</span><button type="button" data-remove-exercise="${i}" aria-label="Remove exercise">×</button></div>`).join('');
+}
+document.getElementById('exerciseForm').addEventListener('submit',e=>{
+ e.preventDefault();if(selectedDate>dateKey(new Date())){alert('Choose today or an earlier date.');return;}
+ const name=document.getElementById('exerciseName').value.trim();if(!name)return;
+ if(!records[selectedDate])records[selectedDate]={};
+ if(!Array.isArray(records[selectedDate].exercises))records[selectedDate].exercises=[];
+ const num=id=>document.getElementById(id).value;
+ records[selectedDate].exercises.push({name,type:document.getElementById('exerciseType').value,sets:num('exerciseSets'),reps:num('exerciseReps'),weight:num('exerciseWeight')});
+ saveRecords();e.target.reset();render();
+});
+document.getElementById('exerciseList').addEventListener('click',e=>{
+ const b=e.target.closest('[data-remove-exercise]');if(!b)return;
+ const arr=dayData().exercises;if(!Array.isArray(arr))return;
+ arr.splice(Number(b.dataset.removeExercise),1);
+ if(!arr.length)delete records[selectedDate].exercises;
+ if(!Object.keys(records[selectedDate]).length)delete records[selectedDate];
+ saveRecords();render();
+});
+function completeCount(key){return types.filter(t=>Boolean(records[key]?.[t])).length;}
+function renderInsights(){
+ const today=dateFromKey(dateKey(new Date()));
+ const completedDates=Object.keys(records).filter(k=>k<=dateKey(today)&&completeCount(k)===3).sort();
+ const completedSet=new Set(completedDates);
+ let best=0,run=0,previous='';
+ completedDates.forEach(k=>{const expected=dateFromKey(k);expected.setDate(expected.getDate()-1);run=(previous===dateKey(expected))?run+1:1;best=Math.max(best,run);previous=k;});
+ // A streak remains current if today or yesterday is fully completed.
+ let cursor=new Date(today);
+ if(!completedSet.has(dateKey(cursor)))cursor.setDate(cursor.getDate()-1);
+ let current=0;
+ while(completedSet.has(dateKey(cursor))){current++;cursor.setDate(cursor.getDate()-1);}
+ document.getElementById('currentStreak').innerHTML=`${current} <small>days</small>`;
+ document.getElementById('bestStreak').innerHTML=`${best} <small>days</small>`;
+ const monday=new Date(today);monday.setDate(monday.getDate()-((monday.getDay()+6)%7));
+ const summarize=start=>{let sessions=0,minutes=0,days=0;for(let i=0;i<7;i++){const d=new Date(start);d.setDate(d.getDate()+i);const data=records[dateKey(d)]||{};const count=types.filter(t=>Boolean(data[t])).length;sessions+=count;if(count)days++;types.forEach(t=>minutes+=Number(data[t]?.duration)||0);}return {sessions,minutes,days};};
+ const prior=new Date(monday);prior.setDate(prior.getDate()-7);
+ const now=summarize(monday),last=summarize(prior);
+ document.getElementById('weeklySessions').innerHTML=`${now.sessions} <small>sessions</small>`;
+ document.getElementById('weeklyMinutes').innerHTML=`${now.minutes} <small>min</small>`;
+ document.getElementById('weeklyDays').innerHTML=`${now.days} <small>/ 7</small>`;
+ const comparison=(n,p,unit)=>`${n-p>=0?'+':''}${n-p} ${unit} vs. last week`;
+ document.getElementById('weeklySessionsDelta').textContent=comparison(now.sessions,last.sessions,'sessions');
+ document.getElementById('weeklyMinutesDelta').textContent=comparison(now.minutes,last.minutes,'min');
+}
+function renderCalendar(){
+ const year=calendarMonth.getFullYear(),month=calendarMonth.getMonth();
+ document.getElementById('calendarTitle').textContent=calendarMonth.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+ const offset=(new Date(year,month,1).getDay()+6)%7;
+ const days=new Date(year,month+1,0).getDate();
+ let html=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class="calendar-weekday">${d}</div>`).join('');
+ for(let i=0;i<offset;i++)html+='<div></div>';
+ for(let d=1;d<=days;d++){
+  const key=dateKey(new Date(year,month,d)),count=completeCount(key);
+  html+=`<button type="button" class="calendar-day ${count===3?'full':count?'partial':''} ${key===selectedDate?'selected':''}" data-calendar-day="${key}" aria-label="${formatDate(key)}: ${count} of 3 workouts"><span>${d}</span><div class="calendar-dots">${'<i></i>'.repeat(count)}</div></button>`;
+ }
+ document.getElementById('calendarGrid').innerHTML=html;
+}
+document.getElementById('calendarPrev').addEventListener('click',()=>{calendarMonth.setMonth(calendarMonth.getMonth()-1);renderCalendar();});
+document.getElementById('calendarNext').addEventListener('click',()=>{calendarMonth.setMonth(calendarMonth.getMonth()+1);renderCalendar();});
+document.getElementById('calendarGrid').addEventListener('click',e=>{
+ const b=e.target.closest('[data-calendar-day]');if(!b)return;
+ selectedDate=b.dataset.calendarDay;render();document.getElementById('workouts').scrollIntoView({behavior:'smooth'});
+});
+render();
+
+
+// Separate weight-loss data store; existing workout records are unchanged.
+const WEIGHT_KEY='dailyform-weight-v1';
+function loadWeight(){try{const value=JSON.parse(localStorage.getItem(WEIGHT_KEY)||'{}');return {start:value.start||null,goal:value.goal||null,unit:value.unit==='kg'?'kg':'lb',entries:value.entries||{}};}catch{return {start:null,goal:null,unit:'lb',entries:{}};}}
+let weightData=loadWeight();
+function persistWeight(){localStorage.setItem(WEIGHT_KEY,JSON.stringify(weightData));}
+function weightNotice(message){document.getElementById('weightMessage').textContent=message;}
+function renderWeight(){
+ const startInput=document.getElementById('weightStart'),goalInput=document.getElementById('weightGoal'),unitInput=document.getElementById('weightUnit'),dateInput=document.getElementById('weighDate');
+ if(document.activeElement!==startInput)startInput.value=weightData.start??'';
+ if(document.activeElement!==goalInput)goalInput.value=weightData.goal??'';
+ if(document.activeElement!==unitInput)unitInput.value=weightData.unit;
+ if(document.activeElement!==dateInput)dateInput.value=selectedDate;
+ const sorted=Object.entries(weightData.entries).filter(([,v])=>Number.isFinite(Number(v))&&Number(v)>0).sort(([a],[b])=>a.localeCompare(b));
+ const latest=sorted.length?Number(sorted[sorted.length-1][1]):null;
+ const format=v=>v===null?'—':`${Number(v.toFixed(1))} ${weightData.unit}`;
+ document.getElementById('weightLatest').textContent=format(latest);
+ document.getElementById('weightChange').textContent=latest!==null&&weightData.start!==null?format(latest-weightData.start):'—';
+ document.getElementById('weightRemaining').textContent=latest!==null&&weightData.goal!==null?format(Math.max(0,latest-weightData.goal)):'—';
+ const distance=weightData.start!==null&&weightData.goal!==null?weightData.start-weightData.goal:0;
+ const pct=distance>0&&latest!==null?Math.max(0,Math.min(100,(weightData.start-latest)/distance*100)):0;
+ document.getElementById('weightProgressBar').style.width=pct+'%';
+ document.getElementById('weightProgressLabel').textContent=distance>0&&latest!==null?`${Math.round(pct)}% toward goal`:distance>0?'Log a weigh-in to begin':'Set a lower goal weight to begin';
+ const history=document.getElementById('weighHistory');
+ history.innerHTML=sorted.length?sorted.slice().reverse().map(([date,val])=>`<div class="weight-history-row"><span>${formatDate(date)}</span><strong>${Number(val)} ${weightData.unit}</strong><button type="button" data-remove-weight="${date}" aria-label="Delete weigh-in from ${date}">×</button></div>`).join(''):'<p class="weight-empty">No weigh-ins yet. Log your first weight above.</p>';
+ const chart=document.getElementById('weightChart');
+ if(sorted.length<2){chart.textContent='Log at least two weigh-ins to see your trend.';return;}
+ const values=sorted.map(([,v])=>Number(v)),lo=Math.min(...values),hi=Math.max(...values),pad=Math.max(1,(hi-lo)*.2),min=lo-pad,max=hi+pad;
+ const width=600,height=170,left=34,right=12,top=15,bottom=30;
+ const x=i=>left+(sorted.length===1?0:i/(sorted.length-1))*(width-left-right);
+ const y=v=>top+(max-v)/(max-min)*(height-top-bottom);
+ const points=values.map((v,i)=>`${x(i)},${y(v)}`).join(' ');
+ const dots=values.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v)}" r="4" fill="#c7f36b"><title>${sorted[i][0]}: ${v} ${weightData.unit}</title></circle>`).join('');
+ chart.innerHTML=`<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Weight trend from ${values[0]} to ${values[values.length-1]} ${weightData.unit}"><line x1="${left}" y1="${top}" x2="${left}" y2="${height-bottom}" stroke="#465449"/><line x1="${left}" y1="${height-bottom}" x2="${width-right}" y2="${height-bottom}" stroke="#465449"/><text x="0" y="${top+4}" fill="#98a39a" font-size="11">${Number(hi.toFixed(1))}</text><text x="0" y="${height-bottom}" fill="#98a39a" font-size="11">${Number(lo.toFixed(1))}</text><polyline fill="none" stroke="#c7f36b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" points="${points}"/>${dots}<text x="${left}" y="${height-5}" fill="#98a39a" font-size="11">${sorted[0][0]}</text><text x="${width-right}" y="${height-5}" text-anchor="end" fill="#98a39a" font-size="11">${sorted[sorted.length-1][0]}</text></svg>`;
+}
+document.getElementById('saveWeightGoal').addEventListener('click',()=>{
+ const start=Number(document.getElementById('weightStart').value),goal=Number(document.getElementById('weightGoal').value),unit=document.getElementById('weightUnit').value;
+ if(!Number.isFinite(start)||!Number.isFinite(goal)||start<=0||goal<=0||goal>=start){weightNotice('Enter a starting weight and a lower, positive goal weight.');return;}
+ if(Object.keys(weightData.entries).length&&weightData.unit!==unit&&!confirm('Changing units does not convert previous weigh-ins. Continue?'))return;
+ weightData.start=start;weightData.goal=goal;weightData.unit=unit;persistWeight();weightNotice('Goal saved.');renderWeight();
+});
+document.getElementById('saveWeighIn').addEventListener('click',()=>{
+ const date=document.getElementById('weighDate').value,raw=document.getElementById('weighValue').value,value=Number(raw);
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||date>dateKey(new Date())){weightNotice('Choose today or a past date.');return;}
+ if(raw.trim()===''||!Number.isFinite(value)||value<=0){weightNotice('Enter a valid positive weight.');return;}
+ weightData.entries[date]=value;persistWeight();document.getElementById('weighValue').value='';weightNotice('Weigh-in saved.');renderWeight();
+});
+document.getElementById('weighHistory').addEventListener('click',e=>{const btn=e.target.closest('[data-remove-weight]');if(!btn)return;if(!confirm('Delete this weigh-in?'))return;delete weightData.entries[btn.dataset.removeWeight];persistWeight();renderWeight();});
+renderWeight();

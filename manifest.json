@@ -1,7 +1,7 @@
 {
   "name": "DailyForm Fitness Tracker",
   "short_name": "DailyForm",
-  "description": "Track your daily strength, cardio, and boxing workouts.",
+  "description": "Track strength, cardio and boxing workouts, streaks and weekly progress.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
