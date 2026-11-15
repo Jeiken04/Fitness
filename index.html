@@ -1,161 +1,144 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#101512">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="DailyForm">
-  <link rel="manifest" href="manifest.json">
-  <title>Daily Form — Fitness Tracker</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="app.js" defer></script>
-</head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="#101512" name="theme-color"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<meta content="DailyForm" name="apple-mobile-web-app-title"/>
+<link href="manifest.json" rel="manifest"/>
+<title>Daily Form — Fitness Tracker</title>
+<link href="style.css?v=5-tabs" rel="stylesheet"/>
+<script defer="" src="app.js?v=5-tabs"></script>
+<script defer="" src="navigation.js?v=5-tabs"></script></head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar">
-      <a class="brand" href="#" aria-label="Daily Form home"><span class="brand-mark">D</span><span>DAILY<span class="brand-light">FORM</span></span></a>
-      <div class="side-label">YOUR SPACE</div>
-      <a class="nav-item active" href="#overview"><span>▦</span> Overview</a>
-      <a class="nav-item" href="#workouts"><span>◉</span> Today's workouts</a>
-      <a class="nav-item" href="#insights"><span>▤</span> Weekly stats</a>
-      <a class="nav-item" href="#progress-dashboard"><span>◫</span> Combined progress</a>
-      <a class="nav-item" href="#weight-loss"><span>⚖</span> Weight loss</a>
-      <a class="nav-item" href="#history"><span>↗</span> Workout history</a>
-      <div class="sidebar-bottom">
-        <div class="quote-mark">“</div>
-        <p>Consistency beats intensity when intensity isn't consistent.</p>
-        <span>KEEP SHOWING UP</span>
-      </div>
-    </aside>
-
-    <main class="main-content">
-      <div id="storageError" class="storage-error" role="alert" hidden></div>
-      <header class="topbar">
-        <div><div class="eyebrow">YOUR DAILY TRAINING LOG</div><h1>Make today count<span class="accent">.</span></h1></div>
-        <div class="date-control"><button id="prevDay" class="icon-button" aria-label="Previous day">‹</button><div><span id="dayLabel">TODAY</span><strong id="dateLabel"></strong></div><button id="nextDay" class="icon-button" aria-label="Next day">›</button><button id="todayBtn" class="today-button">Today</button></div>
-      </header>
-
-      <section class="hero-row" id="overview">
-        <div class="hero-card">
-          <div class="hero-copy"><span class="eyebrow">DAILY CHECK-IN</span><h2>Three sessions.<br><em>One stronger you.</em></h2><p>Put in the work, log your progress, and keep building momentum.</p></div>
-          <div class="hero-stat"><div class="progress-ring" id="progressRing"><div><strong id="completionCount">0/3</strong><span>COMPLETE</span></div></div><span class="ring-caption">DAILY GOAL</span></div>
-          <div class="hero-decoration">TRAIN<br>WITH<br>INTENT</div>
-        </div>
-        <div class="stat-card"><div class="stat-top"><span class="eyebrow">TOTAL TIME</span><span class="stat-icon">◷</span></div><strong id="totalMinutes">0 <small>min</small></strong><p>Time invested today</p><div class="stat-line"><span id="sessionSummary">No sessions logged yet</span></div></div>
-      </section>
-
-      <section class="section-block" id="workouts">
-        <div class="section-heading"><div><span class="eyebrow">THE DAILY THREE</span><h2>Your sessions</h2></div><span class="section-note">Log each session as you go</span></div>
-        <div class="workout-grid">
-          <article class="workout-card strength" data-type="strength">
-            <div class="workout-head"><span class="workout-number">01 / STRENGTH</span><span class="workout-symbol">↗</span></div>
-            <h3>Build strength</h3><p class="workout-desc">Lift with purpose. Record your movements and the work you put in.</p>
-            <div class="field-row"><label>Duration <div class="input-wrap"><input id="strengthDuration" type="number" min="0" placeholder="45"><span>min</span></div></label><label>Exercises <div class="input-wrap"><input id="strengthExercises" type="number" min="0" placeholder="5"><span>total</span></div></label></div>
-            <label class="full-label">What did you train?<textarea id="strengthNotes" rows="2" placeholder="e.g. Squats 3×8 · Bench 3×10 · Rows 3×12"></textarea></label>
-            <button class="complete-button" data-save="strength"><span>＋</span> Log strength session</button>
-            <div class="saved-state" id="strengthSaved">✓ Session saved</div>
-          </article>
-
-          <article class="workout-card cardio" data-type="cardio">
-            <div class="workout-head"><span class="workout-number">02 / CARDIO</span><span class="workout-symbol">⌁</span></div>
-            <h3>Build endurance</h3><p class="workout-desc">Get your heart rate up. Track your pace, distance, and effort.</p>
-            <div class="field-row"><label>Duration <div class="input-wrap"><input id="cardioDuration" type="number" min="0" placeholder="30"><span>min</span></div></label><label>Distance <div class="input-wrap"><input id="cardioDistance" type="number" min="0" step="0.01" placeholder="3.0"><span>mi</span></div></label></div>
-            <label class="full-label">Activity / notes<textarea id="cardioNotes" rows="2" placeholder="e.g. Outdoor run · steady pace · moderate effort"></textarea></label>
-            <button class="complete-button" data-save="cardio"><span>＋</span> Log cardio session</button>
-            <div class="saved-state" id="cardioSaved">✓ Session saved</div>
-          </article>
-
-          <article class="workout-card boxing" data-type="boxing">
-            <div class="workout-head"><span class="workout-number">03 / BOXING</span><span class="workout-symbol">✳</span></div>
-            <h3>Find your rhythm</h3><p class="workout-desc">Work the rounds. Capture your combinations, pace, and focus.</p>
-            <div class="field-row"><label>Duration <div class="input-wrap"><input id="boxingDuration" type="number" min="0" placeholder="30"><span>min</span></div></label><label>Rounds <div class="input-wrap"><input id="boxingRounds" type="number" min="0" placeholder="6"><span>total</span></div></label></div>
-            <label class="full-label">Focus / notes<textarea id="boxingNotes" rows="2" placeholder="e.g. Heavy bag · footwork · 3-minute rounds"></textarea></label>
-            <button class="complete-button" data-save="boxing"><span>＋</span> Log boxing session</button>
-            <div class="saved-state" id="boxingSaved">✓ Session saved</div>
-          </article>
-        </div>
-      </section>
+<div class="app-shell">
+<aside aria-label="DailyForm sections" class="sidebar">
+<a aria-label="Daily Form home" class="brand" href="#"><span class="brand-mark">D</span><span>DAILY<span class="brand-light">FORM</span></span></a>
+<div class="side-label">YOUR SPACE</div><button aria-controls="tab-dashboard" aria-selected="true" class="nav-item tab-nav active" data-tab="dashboard" role="tab" type="button"><span>▦</span> Dashboard</button><button aria-controls="tab-strength" aria-selected="false" class="nav-item tab-nav" data-tab="strength" role="tab" type="button"><span>↗</span> Strength</button><button aria-controls="tab-cardio" aria-selected="false" class="nav-item tab-nav" data-tab="cardio" role="tab" type="button"><span>⌁</span> Cardio</button><button aria-controls="tab-boxing" aria-selected="false" class="nav-item tab-nav" data-tab="boxing" role="tab" type="button"><span>✳</span> Boxing</button><button aria-controls="tab-weight" aria-selected="false" class="nav-item tab-nav" data-tab="weight" role="tab" type="button"><span>⚖</span> Weight Loss</button><button aria-controls="tab-progress" aria-selected="false" class="nav-item tab-nav" data-tab="progress" role="tab" type="button"><span>▤</span> Progress</button><button aria-controls="tab-history" aria-selected="false" class="nav-item tab-nav" data-tab="history" role="tab" type="button"><span>◫</span> History</button><button aria-controls="tab-settings" aria-selected="false" class="nav-item tab-nav" data-tab="settings" role="tab" type="button"><span>⚙</span> Settings</button>
 
 
-      <section class="section-block" id="checklist">
-        <div class="section-heading"><div><span class="eyebrow">TODAY'S PLAN</span><h2>Daily workout checklist</h2></div><span class="section-note" id="checklistCount">0 of 3 done</span></div>
-        <div class="checklist-panel" id="dailyChecklist"></div>
-      </section>
-      <section class="section-block" id="exercise-log">
-        <div class="section-heading"><div><span class="eyebrow">THE DETAILS</span><h2>Exercise logging</h2></div><span class="section-note">Track sets, reps and weight</span></div>
-        <form id="exerciseForm" class="exercise-form">
-          <label>Workout<select id="exerciseType"><option value="strength">Strength</option><option value="cardio">Cardio</option><option value="boxing">Boxing</option></select></label>
-          <label>Exercise<input id="exerciseName" maxlength="90" placeholder="e.g. Bench press" required></label>
-          <label>Sets<input id="exerciseSets" type="number" min="0" step="1" placeholder="3"></label>
-          <label>Reps<input id="exerciseReps" type="number" min="0" step="1" placeholder="10"></label>
-          <label>Weight (lb)<input id="exerciseWeight" type="number" min="0" step="0.5" placeholder="135"></label>
-          <button type="submit" class="complete-button">+ Add exercise</button>
-        </form>
-        <p id="exerciseMessage" class="save-feedback" role="status" aria-live="polite"></p>
-        <div id="exerciseList" class="exercise-list"></div>
-      </section>
-      <section class="section-block" id="insights">
-        <div class="section-heading"><div><span class="eyebrow">YOUR MOMENTUM</span><h2>Streaks & weekly statistics</h2></div><span class="section-note">Week starts Monday</span></div>
-        <div class="insight-grid">
-          <div class="insight-card"><span class="eyebrow">CURRENT STREAK</span><strong id="currentStreak">0 <small>days</small></strong><p>Consecutive days completing all 3 workouts</p></div>
-          <div class="insight-card"><span class="eyebrow">BEST STREAK</span><strong id="bestStreak">0 <small>days</small></strong><p>Your longest full-day training streak</p></div>
-          <div class="insight-card"><span class="eyebrow">THIS WEEK</span><strong id="weeklySessions">0 <small>sessions</small></strong><p id="weeklySessionsDelta">Compared with last week</p></div>
-          <div class="insight-card"><span class="eyebrow">TRAINING TIME</span><strong id="weeklyMinutes">0 <small>min</small></strong><p id="weeklyMinutesDelta">Compared with last week</p></div>
-          <div class="insight-card"><span class="eyebrow">ACTIVE DAYS</span><strong id="weeklyDays">0 <small>/ 7</small></strong><p>Days with at least one session this week</p></div>
-        </div>
-      </section>
-      <section class="section-block" id="calendar-section">
-        <div class="section-heading"><div><span class="eyebrow">THE BIG PICTURE</span><h2>Workout history calendar</h2></div><div class="calendar-nav"><button id="calendarPrev" class="icon-button" aria-label="Previous month">‹</button><strong id="calendarTitle"></strong><button id="calendarNext" class="icon-button" aria-label="Next month">›</button></div></div>
-        <div class="calendar-panel"><div class="calendar-grid" id="calendarGrid"></div><p class="calendar-legend"><span class="legend-dot partial"></span> 1–2 sessions <span class="legend-dot full"></span> All 3 sessions · Select a date to view its logs</p></div>
-      </section>
 
 
-      <section class="section-block" id="weight-loss">
-        <div class="section-heading"><div><span class="eyebrow">YOUR BODYWEIGHT JOURNEY</span><h2>Weight loss tracker</h2></div><span class="section-note">Track trends, not just daily changes</span></div>
-        <div class="weight-layout">
-          <div class="weight-panel">
-            <h3>Set your goal</h3><p class="weight-hint">Enter your starting weight and target weight. Choose the same unit for every entry.</p>
-            <div class="weight-fields"><label>Starting weight<input id="weightStart" type="number" min="1" step="0.1" placeholder="e.g. 200"></label><label>Goal weight<input id="weightGoal" type="number" min="1" step="0.1" placeholder="e.g. 175"></label><label>Unit<select id="weightUnit"><option value="lb">lb</option><option value="kg">kg</option></select></label></div>
-            <button class="complete-button" type="button" id="saveWeightGoal">Save goal</button>
-            <div class="weight-separator"></div>
-            <h3>Log a weigh-in</h3><p class="weight-hint">Use the date selected above or choose a different date.</p>
-            <div class="weight-fields"><label>Date<input id="weighDate" type="date"></label><label>Weight<input id="weighValue" type="number" min="1" step="0.1" placeholder="Current weight"></label></div>
-            <button class="complete-button" type="button" id="saveWeighIn">Save weigh-in</button>
-            <p id="weightMessage" class="weight-message" role="status" aria-live="polite"></p>
-          </div>
-          <div class="weight-panel">
-            <div class="weight-summary"><div><span class="eyebrow">LATEST WEIGHT</span><strong id="weightLatest">—</strong></div><div><span class="eyebrow">CHANGE FROM START</span><strong id="weightChange">—</strong></div><div><span class="eyebrow">TO GOAL</span><strong id="weightRemaining">—</strong></div></div>
-            <div class="weight-progress-head"><span>Goal progress</span><span id="weightProgressLabel">Set a goal to begin</span></div><div class="weight-progress"><div id="weightProgressBar"></div></div>
-            <h3>Weight trend</h3><div class="weight-chart" id="weightChart" aria-label="Weight trend over time"></div>
-          </div>
-        </div>
-        <div class="weight-panel weight-history-panel"><div class="section-heading"><h3>Weigh-in history</h3><span class="section-note">Most recent first</span></div><div id="weighHistory" class="weight-history"></div></div>
-      </section>
 
-      <section class="section-block" id="progress-dashboard">
-        <div class="section-heading"><div><span class="eyebrow">TRAINING + BODYWEIGHT</span><h2>Combined progress dashboard</h2></div><label class="progress-range-label">Time range <select id="combinedRange" aria-label="Weeks to show"><option value="4">Last 4 weeks</option><option value="8" selected>Last 8 weeks</option><option value="12">Last 12 weeks</option></select></label></div>
-        <p class="progress-intro">See your weekly training alongside your weight trend. Weight points are actual weigh-ins; lines between them show the trend, not estimated daily weights.</p>
-        <div class="combined-summary">
-          <div class="combined-kpi"><span class="eyebrow">WORKOUTS</span><strong id="combinedWorkouts">—</strong><small>Sessions in selected period</small></div>
-          <div class="combined-kpi"><span class="eyebrow">TRAINING TIME</span><strong id="combinedTime">—</strong><small>Minutes in selected period</small></div>
-          <div class="combined-kpi"><span class="eyebrow">WEIGHT CHANGE</span><strong id="combinedWeightChange">—</strong><small>First to last weigh-in in range</small></div>
-        </div>
-        <div class="combined-panels">
-          <div class="combined-panel"><div class="combined-panel-head"><h3>Weekly training volume</h3><span>Minutes by workout</span></div><div class="combined-legend"><span><i class="legend-strength"></i>Strength</span><span><i class="legend-cardio"></i>Cardio</span><span><i class="legend-boxing"></i>Boxing</span></div><div id="combinedTrainingChart" class="combined-chart" role="img" aria-label="Weekly training minutes stacked by workout type"></div></div>
-          <div class="combined-panel"><div class="combined-panel-head"><h3>Weight trend</h3><span id="combinedWeightUnit">lb</span></div><div id="combinedWeightChart" class="combined-chart" role="img" aria-label="Weight measurements during the selected weeks"></div></div>
-        </div>
-        <div class="combined-panel combined-week-panel"><div class="combined-panel-head"><h3>Weekly breakdown</h3><span>Compare activity and weigh-ins by week</span></div><div class="combined-table-scroll"><table class="combined-table"><thead><tr><th>Week of</th><th>Strength</th><th>Cardio</th><th>Boxing</th><th>Minutes</th><th>Latest weigh-in</th></tr></thead><tbody id="combinedWeekRows"></tbody></table></div></div>
-        <p class="progress-disclaimer">Your training and weight changes are shown together for context; this dashboard does not assume that one caused the other.</p>
-      </section>
 
-      <section class="history-section" id="history">
-        <div class="section-heading"><div><span class="eyebrow">YOUR CONSISTENCY</span><h2>Daily activity</h2></div><span class="section-note">Saved on this device</span></div>
-        <div class="history-panel"><div id="historyList" class="history-list"><div class="empty-state"><span>◎</span><strong>Your training story starts here.</strong><p>Log a session above and it will show up here.</p></div></div></div>
-      </section>
-      <footer><span>DAILYFORM <span class="accent">/</span> PERSONAL TRAINING LOG</span><span>Your data stays in this browser.</span></footer>
-    </main>
-  </div>
+<div class="sidebar-bottom">
+<div class="quote-mark">“</div>
+<p>Consistency beats intensity when intensity isn't consistent.</p>
+<span>KEEP SHOWING UP</span>
+</div>
+</aside>
+<main class="main-content">
+<div class="storage-error" hidden="" id="storageError" role="alert"></div>
+<header class="topbar">
+<div><div class="eyebrow">YOUR DAILY TRAINING LOG</div><h1>Make today count<span class="accent">.</span></h1></div>
+<div class="date-control"><button aria-label="Previous day" class="icon-button" id="prevDay">‹</button><div><span id="dayLabel">TODAY</span><strong id="dateLabel"></strong></div><button aria-label="Next day" class="icon-button" id="nextDay">›</button><button class="today-button" id="todayBtn">Today</button></div>
+</header>
+
+
+
+
+
+
+
+
+
+
+<div class="tab-panel" data-panel="dashboard" id="tab-dashboard" role="tabpanel"><div class="tab-heading"><h2>Your daily overview</h2><p>Track your three sessions and stay consistent.</p></div><section class="hero-row" id="overview">
+<div class="hero-card">
+<div class="hero-copy"><span class="eyebrow">DAILY CHECK-IN</span><h2>Three sessions.<br/><em>One stronger you.</em></h2><p>Put in the work, log your progress, and keep building momentum.</p></div>
+<div class="hero-stat"><div class="progress-ring" id="progressRing"><div><strong id="completionCount">0/3</strong><span>COMPLETE</span></div></div><span class="ring-caption">DAILY GOAL</span></div>
+<div class="hero-decoration">TRAIN<br/>WITH<br/>INTENT</div>
+</div>
+<div class="stat-card"><div class="stat-top"><span class="eyebrow">TOTAL TIME</span><span class="stat-icon">◷</span></div><strong id="totalMinutes">0 <small>min</small></strong><p>Time invested today</p><div class="stat-line"><span id="sessionSummary">No sessions logged yet</span></div></div>
+</section><section class="section-block" id="checklist">
+<div class="section-heading"><div><span class="eyebrow">TODAY'S PLAN</span><h2>Daily workout checklist</h2></div><span class="section-note" id="checklistCount">0 of 3 done</span></div>
+<div class="checklist-panel" id="dailyChecklist"></div>
+</section></div><div class="tab-panel" data-panel="strength" hidden="" id="tab-strength" role="tabpanel"><div class="tab-heading"><h2>Strength training</h2><p>Log lifts, sets, reps and weight.</p></div><section class="section-block training-tab"><div class="workout-grid"><article class="workout-card strength" data-type="strength">
+<div class="workout-head"><span class="workout-number">01 / STRENGTH</span><span class="workout-symbol">↗</span></div>
+<h3>Build strength</h3><p class="workout-desc">Lift with purpose. Record your movements and the work you put in.</p>
+<div class="field-row"><label>Duration <div class="input-wrap"><input id="strengthDuration" min="0" placeholder="45" type="number"/><span>min</span></div></label><label>Exercises <div class="input-wrap"><input id="strengthExercises" min="0" placeholder="5" type="number"/><span>total</span></div></label></div>
+<label class="full-label">What did you train?<textarea id="strengthNotes" placeholder="e.g. Squats 3×8 · Bench 3×10 · Rows 3×12" rows="2"></textarea></label>
+<button class="complete-button" data-save="strength"><span>＋</span> Log strength session</button>
+<div class="saved-state" id="strengthSaved">✓ Session saved</div>
+</article></div></section><section class="section-block" id="exercise-log">
+<div class="section-heading"><div><span class="eyebrow">THE DETAILS</span><h2>Exercise logging</h2></div><span class="section-note">Track sets, reps and weight</span></div>
+<form class="exercise-form" id="exerciseForm">
+<label>Workout<select id="exerciseType"><option value="strength">Strength</option><option value="cardio">Cardio</option><option value="boxing">Boxing</option></select></label>
+<label>Exercise<input id="exerciseName" maxlength="90" placeholder="e.g. Bench press" required=""/></label>
+<label>Sets<input id="exerciseSets" min="0" placeholder="3" step="1" type="number"/></label>
+<label>Reps<input id="exerciseReps" min="0" placeholder="10" step="1" type="number"/></label>
+<label>Weight (lb)<input id="exerciseWeight" min="0" placeholder="135" step="0.5" type="number"/></label>
+<button class="complete-button" type="submit">+ Add exercise</button>
+</form>
+<p aria-live="polite" class="save-feedback" id="exerciseMessage" role="status"></p>
+<div class="exercise-list" id="exerciseList"></div>
+</section></div><div class="tab-panel" data-panel="cardio" hidden="" id="tab-cardio" role="tabpanel"><div class="tab-heading"><h2>Cardio training</h2><p>Record your endurance sessions.</p></div><section class="section-block training-tab"><div class="workout-grid"><article class="workout-card cardio" data-type="cardio">
+<div class="workout-head"><span class="workout-number">02 / CARDIO</span><span class="workout-symbol">⌁</span></div>
+<h3>Build endurance</h3><p class="workout-desc">Get your heart rate up. Track your pace, distance, and effort.</p>
+<div class="field-row"><label>Duration <div class="input-wrap"><input id="cardioDuration" min="0" placeholder="30" type="number"/><span>min</span></div></label><label>Distance <div class="input-wrap"><input id="cardioDistance" min="0" placeholder="3.0" step="0.01" type="number"/><span>mi</span></div></label></div>
+<label class="full-label">Activity / notes<textarea id="cardioNotes" placeholder="e.g. Outdoor run · steady pace · moderate effort" rows="2"></textarea></label>
+<button class="complete-button" data-save="cardio"><span>＋</span> Log cardio session</button>
+<div class="saved-state" id="cardioSaved">✓ Session saved</div>
+</article></div></section></div><div class="tab-panel" data-panel="boxing" hidden="" id="tab-boxing" role="tabpanel"><div class="tab-heading"><h2>Boxing training</h2><p>Record your rounds and training focus.</p></div><section class="section-block training-tab"><div class="workout-grid"><article class="workout-card boxing" data-type="boxing">
+<div class="workout-head"><span class="workout-number">03 / BOXING</span><span class="workout-symbol">✳</span></div>
+<h3>Find your rhythm</h3><p class="workout-desc">Work the rounds. Capture your combinations, pace, and focus.</p>
+<div class="field-row"><label>Duration <div class="input-wrap"><input id="boxingDuration" min="0" placeholder="30" type="number"/><span>min</span></div></label><label>Rounds <div class="input-wrap"><input id="boxingRounds" min="0" placeholder="6" type="number"/><span>total</span></div></label></div>
+<label class="full-label">Focus / notes<textarea id="boxingNotes" placeholder="e.g. Heavy bag · footwork · 3-minute rounds" rows="2"></textarea></label>
+<button class="complete-button" data-save="boxing"><span>＋</span> Log boxing session</button>
+<div class="saved-state" id="boxingSaved">✓ Session saved</div>
+</article></div></section></div><div class="tab-panel" data-panel="weight" hidden="" id="tab-weight" role="tabpanel"><div class="tab-heading"><h2>Weight loss</h2><p>Your weigh-ins, goals and trends.</p></div><section class="section-block" id="weight-loss">
+<div class="section-heading"><div><span class="eyebrow">YOUR BODYWEIGHT JOURNEY</span><h2>Weight loss tracker</h2></div><span class="section-note">Track trends, not just daily changes</span></div>
+<div class="weight-layout">
+<div class="weight-panel">
+<h3>Set your goal</h3><p class="weight-hint">Enter your starting weight and target weight. Choose the same unit for every entry.</p>
+<div class="weight-fields"><label>Starting weight<input id="weightStart" min="1" placeholder="e.g. 200" step="0.1" type="number"/></label><label>Goal weight<input id="weightGoal" min="1" placeholder="e.g. 175" step="0.1" type="number"/></label><label>Unit<select id="weightUnit"><option value="lb">lb</option><option value="kg">kg</option></select></label></div>
+<button class="complete-button" id="saveWeightGoal" type="button">Save goal</button>
+<div class="weight-separator"></div>
+<h3>Log a weigh-in</h3><p class="weight-hint">Use the date selected above or choose a different date.</p>
+<div class="weight-fields"><label>Date<input id="weighDate" type="date"/></label><label>Weight<input id="weighValue" min="1" placeholder="Current weight" step="0.1" type="number"/></label></div>
+<button class="complete-button" id="saveWeighIn" type="button">Save weigh-in</button>
+<p aria-live="polite" class="weight-message" id="weightMessage" role="status"></p>
+</div>
+<div class="weight-panel">
+<div class="weight-summary"><div><span class="eyebrow">LATEST WEIGHT</span><strong id="weightLatest">—</strong></div><div><span class="eyebrow">CHANGE FROM START</span><strong id="weightChange">—</strong></div><div><span class="eyebrow">TO GOAL</span><strong id="weightRemaining">—</strong></div></div>
+<div class="weight-progress-head"><span>Goal progress</span><span id="weightProgressLabel">Set a goal to begin</span></div><div class="weight-progress"><div id="weightProgressBar"></div></div>
+<h3>Weight trend</h3><div aria-label="Weight trend over time" class="weight-chart" id="weightChart"></div>
+</div>
+</div>
+<div class="weight-panel weight-history-panel"><div class="section-heading"><h3>Weigh-in history</h3><span class="section-note">Most recent first</span></div><div class="weight-history" id="weighHistory"></div></div>
+</section></div><div class="tab-panel" data-panel="progress" hidden="" id="tab-progress" role="tabpanel"><div class="tab-heading"><h2>Your progress</h2><p>Weekly stats and combined training insights.</p></div><section class="section-block" id="insights">
+<div class="section-heading"><div><span class="eyebrow">YOUR MOMENTUM</span><h2>Streaks &amp; weekly statistics</h2></div><span class="section-note">Week starts Monday</span></div>
+<div class="insight-grid">
+<div class="insight-card"><span class="eyebrow">CURRENT STREAK</span><strong id="currentStreak">0 <small>days</small></strong><p>Consecutive days completing all 3 workouts</p></div>
+<div class="insight-card"><span class="eyebrow">BEST STREAK</span><strong id="bestStreak">0 <small>days</small></strong><p>Your longest full-day training streak</p></div>
+<div class="insight-card"><span class="eyebrow">THIS WEEK</span><strong id="weeklySessions">0 <small>sessions</small></strong><p id="weeklySessionsDelta">Compared with last week</p></div>
+<div class="insight-card"><span class="eyebrow">TRAINING TIME</span><strong id="weeklyMinutes">0 <small>min</small></strong><p id="weeklyMinutesDelta">Compared with last week</p></div>
+<div class="insight-card"><span class="eyebrow">ACTIVE DAYS</span><strong id="weeklyDays">0 <small>/ 7</small></strong><p>Days with at least one session this week</p></div>
+</div>
+</section><section class="section-block" id="progress-dashboard">
+<div class="section-heading"><div><span class="eyebrow">TRAINING + BODYWEIGHT</span><h2>Combined progress dashboard</h2></div><label class="progress-range-label">Time range <select aria-label="Weeks to show" id="combinedRange"><option value="4">Last 4 weeks</option><option selected="" value="8">Last 8 weeks</option><option value="12">Last 12 weeks</option></select></label></div>
+<p class="progress-intro">See your weekly training alongside your weight trend. Weight points are actual weigh-ins; lines between them show the trend, not estimated daily weights.</p>
+<div class="combined-summary">
+<div class="combined-kpi"><span class="eyebrow">WORKOUTS</span><strong id="combinedWorkouts">—</strong><small>Sessions in selected period</small></div>
+<div class="combined-kpi"><span class="eyebrow">TRAINING TIME</span><strong id="combinedTime">—</strong><small>Minutes in selected period</small></div>
+<div class="combined-kpi"><span class="eyebrow">WEIGHT CHANGE</span><strong id="combinedWeightChange">—</strong><small>First to last weigh-in in range</small></div>
+</div>
+<div class="combined-panels">
+<div class="combined-panel"><div class="combined-panel-head"><h3>Weekly training volume</h3><span>Minutes by workout</span></div><div class="combined-legend"><span><i class="legend-strength"></i>Strength</span><span><i class="legend-cardio"></i>Cardio</span><span><i class="legend-boxing"></i>Boxing</span></div><div aria-label="Weekly training minutes stacked by workout type" class="combined-chart" id="combinedTrainingChart" role="img"></div></div>
+<div class="combined-panel"><div class="combined-panel-head"><h3>Weight trend</h3><span id="combinedWeightUnit">lb</span></div><div aria-label="Weight measurements during the selected weeks" class="combined-chart" id="combinedWeightChart" role="img"></div></div>
+</div>
+<div class="combined-panel combined-week-panel"><div class="combined-panel-head"><h3>Weekly breakdown</h3><span>Compare activity and weigh-ins by week</span></div><div class="combined-table-scroll"><table class="combined-table"><thead><tr><th>Week of</th><th>Strength</th><th>Cardio</th><th>Boxing</th><th>Minutes</th><th>Latest weigh-in</th></tr></thead><tbody id="combinedWeekRows"></tbody></table></div></div>
+<p class="progress-disclaimer">Your training and weight changes are shown together for context; this dashboard does not assume that one caused the other.</p>
+</section></div><div class="tab-panel" data-panel="history" hidden="" id="tab-history" role="tabpanel"><div class="tab-heading"><h2>Training history</h2><p>Explore your workout calendar and activity logs.</p></div><section class="section-block" id="calendar-section">
+<div class="section-heading"><div><span class="eyebrow">THE BIG PICTURE</span><h2>Workout history calendar</h2></div><div class="calendar-nav"><button aria-label="Previous month" class="icon-button" id="calendarPrev">‹</button><strong id="calendarTitle"></strong><button aria-label="Next month" class="icon-button" id="calendarNext">›</button></div></div>
+<div class="calendar-panel"><div class="calendar-grid" id="calendarGrid"></div><p class="calendar-legend"><span class="legend-dot partial"></span> 1–2 sessions <span class="legend-dot full"></span> All 3 sessions · Select a date to view its logs</p></div>
+</section><section class="history-section" id="history">
+<div class="section-heading"><div><span class="eyebrow">YOUR CONSISTENCY</span><h2>Daily activity</h2></div><span class="section-note">Saved on this device</span></div>
+<div class="history-panel"><div class="history-list" id="historyList"><div class="empty-state"><span>◎</span><strong>Your training story starts here.</strong><p>Log a session above and it will show up here.</p></div></div></div>
+</section></div><div class="tab-panel" data-panel="settings" hidden="" id="tab-settings" role="tabpanel"><div class="tab-heading"><h2>App settings</h2><p>Storage and device information.</p></div><div class="settings-card"><h3>Saved on this device</h3><p>DailyForm saves workout and weight records in this browser. Records do not automatically sync between your computer and iPhone. Use the same site address and avoid clearing site data to keep your logs.</p><p>Install from Safari using Share → Add to Home Screen. Updates may require a refresh if your browser has cached older files.</p></div></div><footer><span>DAILYFORM <span class="accent">/</span> PERSONAL TRAINING LOG</span><span>Your data stays in this browser.</span></footer></main>
+</div>
 </body>
 </html>

@@ -206,7 +206,7 @@ document.getElementById('calendarPrev').addEventListener('click',()=>{calendarMo
 document.getElementById('calendarNext').addEventListener('click',()=>{calendarMonth.setMonth(calendarMonth.getMonth()+1);renderCalendar();});
 document.getElementById('calendarGrid').addEventListener('click',e=>{
  const b=e.target.closest('[data-calendar-day]');if(!b)return;
- selectedDate=b.dataset.calendarDay;render();document.getElementById('workouts').scrollIntoView({behavior:'smooth'});
+ selectedDate=b.dataset.calendarDay;render();document.querySelector('[data-tab="dashboard"]')?.click();
 });
 
 // Separate weight-loss data store; existing workout records are unchanged.
