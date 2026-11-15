@@ -63,29 +63,10 @@ function cardioProgress(){
  $('cardioTrend').innerHTML=rows.length?rows.map(({key,r})=>`<div class="phase-item"><span>${escapeHTML(key)}</span><span>${n(r.metric).toFixed(2)} mi · ${n(r.duration)} min</span></div>`).join(''):'<p class="helper">No cardio distance logged in the last 7 days.</p>';
 }
 
-function timer({display,start,reset,getSeconds,onTick}){
- let left=0,running=false,last=0,handle=null;
- const paint=()=>{$(display).textContent=fmtTime(Math.max(0,Math.ceil(left/1000)))};
- const stop=()=>{running=false;clearInterval(handle);handle=null};
- const tick=()=>{const now=Date.now();left=Math.max(0,left-(now-last));last=now;if(left<=0){stop();onTick?.();}paint()};
- const resetFn=()=>{stop();left=getSeconds()*1000;paint()};
- $(start).addEventListener('click',()=>{if(running){tick();stop();return}if(left<=0)left=getSeconds()*1000;last=Date.now();running=true;handle=setInterval(tick,150);paint()});
- $(reset).addEventListener('click',resetFn);resetFn();return {reset:resetFn};
-}
-const rest=timer({display:'restDisplay',start:'restStart',reset:'restReset',getSeconds:()=>n($('restSeconds').value)});
-$('restSeconds').addEventListener('change',rest.reset);
-let boxing={round:1,stage:'round',left:180000,running:false,last:0,handle:null};
-const boxingSettings=()=>({rounds:Math.max(1,Math.min(30,n($('boxingTimerRounds').value)||1)),roundMs:Math.max(10,Math.min(1800,n($('boxingRoundSeconds').value)||180))*1000,restMs:Math.max(0,Math.min(600,n($('boxingRestSeconds').value)))*1000});
-function boxingPaint(){ $('boxingTimerDisplay').textContent=fmtTime(Math.ceil(Math.max(0,boxing.left)/1000));$('boxingTimerStatus').textContent=boxing.stage==='done'?'Workout complete':`${boxing.stage==='round'?'Round':'Rest after round'} ${boxing.round} / ${boxingSettings().rounds}${boxing.running?' · Running':' · Paused'}`; }
-function boxingStop(){boxing.running=false;clearInterval(boxing.handle);boxing.handle=null}
-function boxingReset(){boxingStop();boxing.round=1;boxing.stage='round';boxing.left=boxingSettings().roundMs;boxingPaint()}
-function boxingTick(){const now=Date.now();boxing.left-=now-boxing.last;boxing.last=now;const cfg=boxingSettings();let loops=0;while(boxing.left<=0&&boxing.stage!=='done'&&loops++<100){if(boxing.stage==='round'){if(boxing.round>=cfg.rounds){boxing.stage='done';boxing.left=0;boxingStop();break}if(cfg.restMs){boxing.stage='rest';boxing.left+=cfg.restMs}else{boxing.round++;boxing.left+=cfg.roundMs}}else{boxing.round++;boxing.stage='round';boxing.left+=cfg.roundMs}}boxingPaint()}
-$('boxingTimerStart').addEventListener('click',()=>{if(boxing.running){boxingTick();boxingStop();boxingPaint();return}if(boxing.stage==='done')boxingReset();boxing.running=true;boxing.last=Date.now();boxing.handle=setInterval(boxingTick,150);boxingPaint()});
-$('boxingTimerReset').addEventListener('click',boxingReset);
-['boxingTimerRounds','boxingRoundSeconds','boxingRestSeconds'].forEach(id=>$(id).addEventListener('change',boxingReset));boxingReset();
+// Timers are initialized by polish.js (Phase 1.1).
 
 function backup(){
- const keys=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY];const data={format:'dailyform-backup',version:1,exportedAt:new Date().toISOString(),storage:{}};
+ const keys=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY,'dailyform-exercise-drafts-v1','dailyform-timer-preferences-v1'];const data={format:'dailyform-backup',version:1,exportedAt:new Date().toISOString(),storage:{}};
  keys.forEach(key=>{const value=localStorage.getItem(key);if(value!==null)data.storage[key]=JSON.parse(value)});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`dailyform-backup-${dateKey(new Date())}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
@@ -96,7 +77,7 @@ $('importBackup').addEventListener('change',async e=>{
   if(file.size>5_000_000)throw Error('File too large (maximum 5 MB).');
   const obj=JSON.parse(await file.text());
   if(obj.format!=='dailyform-backup'||obj.version!==1||!obj.storage||typeof obj.storage!=='object')throw Error('Not a compatible DailyForm backup.');
-  const allowed=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY];
+  const allowed=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY,'dailyform-exercise-drafts-v1','dailyform-timer-preferences-v1'];
   const items=allowed.filter(k=>Object.prototype.hasOwnProperty.call(obj.storage,k)).map(k=>[k,obj.storage[k]]);
   if(!items.length)throw Error('No supported records in this backup.');
   for(const [key,value] of items){if(!value||typeof value!=='object'||Array.isArray(value)!==(key===TEMPLATES_KEY))throw Error('Invalid data for '+key)}
