@@ -19,7 +19,8 @@
       <div class="side-label">YOUR SPACE</div>
       <a class="nav-item active" href="#overview"><span>▦</span> Overview</a>
       <a class="nav-item" href="#workouts"><span>◉</span> Today's workouts</a>
-      <a class="nav-item" href="#insights"><span>▤</span> Progress & stats</a>
+      <a class="nav-item" href="#insights"><span>▤</span> Weekly stats</a>
+      <a class="nav-item" href="#progress-dashboard"><span>◫</span> Combined progress</a>
       <a class="nav-item" href="#weight-loss"><span>⚖</span> Weight loss</a>
       <a class="nav-item" href="#history"><span>↗</span> Workout history</a>
       <div class="sidebar-bottom">
@@ -30,6 +31,7 @@
     </aside>
 
     <main class="main-content">
+      <div id="storageError" class="storage-error" role="alert" hidden></div>
       <header class="topbar">
         <div><div class="eyebrow">YOUR DAILY TRAINING LOG</div><h1>Make today count<span class="accent">.</span></h1></div>
         <div class="date-control"><button id="prevDay" class="icon-button" aria-label="Previous day">‹</button><div><span id="dayLabel">TODAY</span><strong id="dateLabel"></strong></div><button id="nextDay" class="icon-button" aria-label="Next day">›</button><button id="todayBtn" class="today-button">Today</button></div>
@@ -91,6 +93,7 @@
           <label>Weight (lb)<input id="exerciseWeight" type="number" min="0" step="0.5" placeholder="135"></label>
           <button type="submit" class="complete-button">+ Add exercise</button>
         </form>
+        <p id="exerciseMessage" class="save-feedback" role="status" aria-live="polite"></p>
         <div id="exerciseList" class="exercise-list"></div>
       </section>
       <section class="section-block" id="insights">
@@ -115,11 +118,11 @@
           <div class="weight-panel">
             <h3>Set your goal</h3><p class="weight-hint">Enter your starting weight and target weight. Choose the same unit for every entry.</p>
             <div class="weight-fields"><label>Starting weight<input id="weightStart" type="number" min="1" step="0.1" placeholder="e.g. 200"></label><label>Goal weight<input id="weightGoal" type="number" min="1" step="0.1" placeholder="e.g. 175"></label><label>Unit<select id="weightUnit"><option value="lb">lb</option><option value="kg">kg</option></select></label></div>
-            <button class="complete-button" id="saveWeightGoal">Save goal</button>
+            <button class="complete-button" type="button" id="saveWeightGoal">Save goal</button>
             <div class="weight-separator"></div>
             <h3>Log a weigh-in</h3><p class="weight-hint">Use the date selected above or choose a different date.</p>
             <div class="weight-fields"><label>Date<input id="weighDate" type="date"></label><label>Weight<input id="weighValue" type="number" min="1" step="0.1" placeholder="Current weight"></label></div>
-            <button class="complete-button" id="saveWeighIn">Save weigh-in</button>
+            <button class="complete-button" type="button" id="saveWeighIn">Save weigh-in</button>
             <p id="weightMessage" class="weight-message" role="status" aria-live="polite"></p>
           </div>
           <div class="weight-panel">
@@ -129,6 +132,22 @@
           </div>
         </div>
         <div class="weight-panel weight-history-panel"><div class="section-heading"><h3>Weigh-in history</h3><span class="section-note">Most recent first</span></div><div id="weighHistory" class="weight-history"></div></div>
+      </section>
+
+      <section class="section-block" id="progress-dashboard">
+        <div class="section-heading"><div><span class="eyebrow">TRAINING + BODYWEIGHT</span><h2>Combined progress dashboard</h2></div><label class="progress-range-label">Time range <select id="combinedRange" aria-label="Weeks to show"><option value="4">Last 4 weeks</option><option value="8" selected>Last 8 weeks</option><option value="12">Last 12 weeks</option></select></label></div>
+        <p class="progress-intro">See your weekly training alongside your weight trend. Weight points are actual weigh-ins; lines between them show the trend, not estimated daily weights.</p>
+        <div class="combined-summary">
+          <div class="combined-kpi"><span class="eyebrow">WORKOUTS</span><strong id="combinedWorkouts">—</strong><small>Sessions in selected period</small></div>
+          <div class="combined-kpi"><span class="eyebrow">TRAINING TIME</span><strong id="combinedTime">—</strong><small>Minutes in selected period</small></div>
+          <div class="combined-kpi"><span class="eyebrow">WEIGHT CHANGE</span><strong id="combinedWeightChange">—</strong><small>First to last weigh-in in range</small></div>
+        </div>
+        <div class="combined-panels">
+          <div class="combined-panel"><div class="combined-panel-head"><h3>Weekly training volume</h3><span>Minutes by workout</span></div><div class="combined-legend"><span><i class="legend-strength"></i>Strength</span><span><i class="legend-cardio"></i>Cardio</span><span><i class="legend-boxing"></i>Boxing</span></div><div id="combinedTrainingChart" class="combined-chart" role="img" aria-label="Weekly training minutes stacked by workout type"></div></div>
+          <div class="combined-panel"><div class="combined-panel-head"><h3>Weight trend</h3><span id="combinedWeightUnit">lb</span></div><div id="combinedWeightChart" class="combined-chart" role="img" aria-label="Weight measurements during the selected weeks"></div></div>
+        </div>
+        <div class="combined-panel combined-week-panel"><div class="combined-panel-head"><h3>Weekly breakdown</h3><span>Compare activity and weigh-ins by week</span></div><div class="combined-table-scroll"><table class="combined-table"><thead><tr><th>Week of</th><th>Strength</th><th>Cardio</th><th>Boxing</th><th>Minutes</th><th>Latest weigh-in</th></tr></thead><tbody id="combinedWeekRows"></tbody></table></div></div>
+        <p class="progress-disclaimer">Your training and weight changes are shown together for context; this dashboard does not assume that one caused the other.</p>
       </section>
 
       <section class="history-section" id="history">
