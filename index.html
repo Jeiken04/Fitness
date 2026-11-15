@@ -8,11 +8,12 @@
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
 <meta content="DailyForm" name="apple-mobile-web-app-title"/>
-<link href="manifest.json" rel="manifest"/>
+<link href="manifest.json?v=10-android" rel="manifest"/>
+<link href="icons/icon-192.png" rel="apple-touch-icon"/>
 <title>Daily Form — Fitness Tracker</title>
-<link href="style.css?v=9-unified" rel="stylesheet"/>
-<script defer="" src="app.js?v=9-unified"></script>
-<script defer="" src="navigation.js?v=9-unified"></script><script defer="" src="phase1.js?v=9-unified"></script><script defer="" src="polish.js?v=9-unified"></script><script defer="" src="phase12.js?v=9-unified"></script><script defer src="unified.js?v=9-unified"></script></head>
+<link href="style.css?v=10-android" rel="stylesheet"/>
+<script defer="" src="app.js?v=10-android"></script>
+<script defer="" src="navigation.js?v=10-android"></script><script defer="" src="phase1.js?v=10-android"></script><script defer="" src="polish.js?v=10-android"></script><script defer="" src="phase12.js?v=10-android"></script><script defer src="unified.js?v=10-android"></script><script defer src="android.js?v=10-android"></script></head>
 <body>
 <div class="app-shell">
 <aside aria-label="DailyForm sections" class="sidebar">
@@ -123,7 +124,7 @@ Overhead press | 3 | 10 | 65" rows="4"></textarea></label><button class="phase-b
 </section><section class="history-section" id="history">
 <div class="section-heading"><div><span class="eyebrow">YOUR CONSISTENCY</span><h2>Daily activity</h2></div><span class="section-note">Saved on this device</span></div>
 <div class="history-panel"><div class="history-list" id="historyList"><div class="empty-state"><span>◎</span><strong>Your training story starts here.</strong><p>Log a session above and it will show up here.</p></div></div></div>
-</section></div><div class="tab-panel" data-panel="settings" hidden="" id="tab-settings" role="tabpanel"><div class="tab-heading"><h2>App settings</h2><p>Storage and device information.</p></div><div class="settings-card"><h3>Backup &amp; restore</h3><p>Export a JSON backup of workouts, weigh-ins, templates, detailed sets, planner, and workout journals. Importing replaces the supported records on this device.</p><button class="phase-btn" id="exportBackup" type="button">Export backup</button><label class="backup-label">Import JSON backup<input accept=".json,application/json" id="importBackup" type="file"/></label><p class="phase-feedback" id="backupFeedback" role="status"></p></div><div class="settings-card"><h3>Saved on this device</h3><p>DailyForm saves workout and weight records in this browser. Records do not automatically sync between your computer and iPhone. Use the same site address and avoid clearing site data to keep your logs.</p><p>Install from Safari using Share → Add to Home Screen. Updates may require a refresh if your browser has cached older files.</p></div></div><footer><span>DAILYFORM <span class="accent">/</span> PERSONAL TRAINING LOG</span><span>Your data stays in this browser.</span></footer></main>
+</section></div><div class="tab-panel" data-panel="settings" hidden="" id="tab-settings" role="tabpanel"><div class="tab-heading"><h2>App settings</h2><p>Storage and device information.</p></div><div class="settings-card"><h3>Backup &amp; restore</h3><p>Export a JSON backup of workouts, weigh-ins, templates, detailed sets, planner, and workout journals. Importing replaces the supported records on this device.</p><button class="phase-btn" id="exportBackup" type="button">Export backup</button><label class="backup-label">Import JSON backup<input accept=".json,application/json" id="importBackup" type="file"/></label><p class="phase-feedback" id="backupFeedback" role="status"></p></div><div class="settings-card android-install-card" id="androidInstallCard" hidden><h3>Android installation</h3><p id="androidInstallStatus" role="status">Checking Android installation support…</p><button class="phase-btn" id="androidInstallButton" type="button" hidden>Install DailyForm</button><p class="helper">Install from Chrome’s menu if no install button appears. Offline use is available after the first successful online visit.</p></div><div class="settings-card"><h3>Saved on this device</h3><p>DailyForm saves workout and weight records in this browser. Records do not automatically sync between your computer and iPhone. Use the same site address and avoid clearing site data to keep your logs.</p><p>On iPhone, install from Safari using Share → Add to Home Screen. On Android, use Chrome → Install app or Add to Home screen. Updates may require a refresh if your browser has cached older files.</p></div></div><footer><span>DAILYFORM <span class="accent">/</span> PERSONAL TRAINING LOG</span><span>Your data stays in this browser.</span></footer></main>
 </div>
 </body>
 </html>
