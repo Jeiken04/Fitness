@@ -241,3 +241,71 @@ document.getElementById('saveWeighIn').addEventListener('click',()=>{
 });
 document.getElementById('weighHistory').addEventListener('click',e=>{const btn=e.target.closest('[data-remove-weight]');if(!btn)return;if(!confirm('Delete this weigh-in?'))return;delete weightData.entries[btn.dataset.removeWeight];persistWeight();renderWeight();});
 renderWeight();
+
+// Combined training + weight analytics. Existing storage formats remain unchanged.
+function mondayOf(date){const d=new Date(date.getFullYear(),date.getMonth(),date.getDate());d.setDate(d.getDate()-(d.getDay()+6)%7);return d;}
+function combinedWeeks(count){
+ const current=mondayOf(new Date()),weeks=[];
+ for(let i=count-1;i>=0;i--){
+  const start=new Date(current);start.setDate(start.getDate()-7*i);
+  const end=new Date(start);end.setDate(end.getDate()+6);
+  const totals={strength:0,cardio:0,boxing:0,sessions:0,minutes:0};
+  for(let day=0;day<7;day++){
+   const date=new Date(start);date.setDate(date.getDate()+day);
+   if(date>new Date())continue;
+   const data=records[dateKey(date)]||{};
+   types.forEach(type=>{if(data[type]){totals.sessions++;const minutes=Number(data[type].duration)||0;totals[type]+=minutes;totals.minutes+=minutes;}});
+  }
+  const weighIns=Object.entries(weightData.entries).filter(([key,val])=>key>=dateKey(start)&&key<=dateKey(end)&&key<=dateKey(new Date())&&Number.isFinite(Number(val))&&Number(val)>0).sort(([a],[b])=>a.localeCompare(b));
+  weeks.push({start,end,...totals,weighIns});
+ }
+ return weeks;
+}
+function renderCombinedProgress(){
+ const count=Number(document.getElementById('combinedRange').value)||8;
+ const weeks=combinedWeeks(count),start=dateKey(weeks[0].start),today=dateKey(new Date());
+ const totalSessions=weeks.reduce((n,w)=>n+w.sessions,0),totalMinutes=weeks.reduce((n,w)=>n+w.minutes,0);
+ const weighIns=Object.entries(weightData.entries).filter(([key,val])=>key>=start&&key<=today&&Number.isFinite(Number(val))&&Number(val)>0).sort(([a],[b])=>a.localeCompare(b));
+ document.getElementById('combinedWorkouts').textContent=String(totalSessions);
+ document.getElementById('combinedTime').textContent=totalMinutes.toLocaleString()+' min';
+ document.getElementById('combinedWeightUnit').textContent=weightData.unit;
+ const change=weighIns.length>=2?Number(weighIns[weighIns.length-1][1])-Number(weighIns[0][1]):null;
+ document.getElementById('combinedWeightChange').textContent=change===null?'—':`${change>0?'+':''}${Number(change.toFixed(1))} ${weightData.unit}`;
+ const chart=document.getElementById('combinedTrainingChart');
+ const W=560,H=210,L=39,R=12,T=15,B=38,plotH=H-T-B;
+ const max=Math.max(1,...weeks.map(w=>w.minutes));
+ const slot=(W-L-R)/weeks.length,bw=Math.min(32,slot*.57);
+ let bars='';
+ weeks.forEach((week,i)=>{
+  const x=L+slot*(i+.5)-bw/2;let y=H-B;
+  [['strength','#c7f36b'],['cardio','#83b9ee'],['boxing','#f2a66b']].forEach(([type,color])=>{
+   const height=week[type]/max*plotH;y-=height;
+   if(height>0)bars+=`<rect x="${x}" y="${y}" width="${bw}" height="${height}" rx="2" fill="${color}"><title>${type}: ${week[type]} min, week of ${dateKey(week.start)}</title></rect>`;
+  });
+  bars+=`<text x="${x+bw/2}" y="${H-15}" text-anchor="middle" fill="#98a39a" font-size="10">${week.start.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</text>`;
+ });
+ chart.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Stacked weekly training minutes"><line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="#465449"/><text x="2" y="${T+5}" fill="#98a39a" font-size="10">${max}m</text><text x="2" y="${H-B}" fill="#98a39a" font-size="10">0</text>${bars}</svg>`;
+ const weightChart=document.getElementById('combinedWeightChart');
+ if(weighIns.length<2){weightChart.textContent='Log at least two weigh-ins in this period to see a weight trend.';}
+ else{
+  const vals=weighIns.map(([,v])=>Number(v)),minVal=Math.min(...vals),maxVal=Math.max(...vals),padding=Math.max(.5,(maxVal-minVal)*.15);
+  const min=minVal-padding,max=maxVal+padding;
+  const first=dateFromKey(start).getTime(),last=new Date().getTime(),span=Math.max(1,last-first);
+  const x=key=>L+(dateFromKey(key).getTime()-first)/span*(W-L-R);
+  const y=value=>T+(max-value)/(max-min)*plotH;
+  const points=weighIns.map(([key,value])=>`${x(key)},${y(Number(value))}`).join(' ');
+  const dots=weighIns.map(([key,value])=>`<circle cx="${x(key)}" cy="${y(Number(value))}" r="4" fill="#c7f36b"><title>${key}: ${value} ${weightData.unit}</title></circle>`).join('');
+  weightChart.innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Weight measurements from ${vals[0]} to ${vals[vals.length-1]} ${weightData.unit}"><line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="#465449"/><text x="2" y="${T+5}" fill="#98a39a" font-size="10">${Number(maxVal.toFixed(1))}</text><text x="2" y="${H-B}" fill="#98a39a" font-size="10">${Number(minVal.toFixed(1))}</text><polyline fill="none" stroke="#c7f36b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" points="${points}"/>${dots}<text x="${L}" y="${H-15}" fill="#98a39a" font-size="10">${weighIns[0][0].slice(5)}</text><text x="${W-R}" y="${H-15}" text-anchor="end" fill="#98a39a" font-size="10">${weighIns[weighIns.length-1][0].slice(5)}</text></svg>`;
+ }
+ document.getElementById('combinedWeekRows').innerHTML=weeks.slice().reverse().map(w=>{
+  const latest=w.weighIns.length?`${Number(w.weighIns[w.weighIns.length-1][1])} ${weightData.unit}`:'—';
+  return `<tr><td>${w.start.toLocaleDateString(undefined,{month:'short',day:'numeric'})}</td><td>${w.strength} min</td><td>${w.cardio} min</td><td>${w.boxing} min</td><td>${w.minutes} min</td><td>${latest}</td></tr>`;
+ }).join('');
+}
+document.getElementById('combinedRange').addEventListener('change',renderCombinedProgress);
+// Wrap existing rendering functions so all changes immediately refresh the combined dashboard.
+const previousRender=render;
+render=function(){previousRender();renderCombinedProgress();};
+const previousRenderWeight=renderWeight;
+renderWeight=function(){previousRenderWeight();renderCombinedProgress();};
+renderCombinedProgress();
