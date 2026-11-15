@@ -66,7 +66,7 @@ function cardioProgress(){
 // Timers are initialized by polish.js (Phase 1.1).
 
 function backup(){
- const keys=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY,'dailyform-exercise-drafts-v1','dailyform-timer-preferences-v1'];const data={format:'dailyform-backup',version:1,exportedAt:new Date().toISOString(),storage:{}};
+ const keys=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY,'dailyform-exercise-drafts-v1','dailyform-timer-preferences-v1','dailyform-phase12-v1'];const data={format:'dailyform-backup',version:1,exportedAt:new Date().toISOString(),storage:{}};
  keys.forEach(key=>{const value=localStorage.getItem(key);if(value!==null)data.storage[key]=JSON.parse(value)});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`dailyform-backup-${dateKey(new Date())}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
@@ -77,7 +77,7 @@ $('importBackup').addEventListener('change',async e=>{
   if(file.size>5_000_000)throw Error('File too large (maximum 5 MB).');
   const obj=JSON.parse(await file.text());
   if(obj.format!=='dailyform-backup'||obj.version!==1||!obj.storage||typeof obj.storage!=='object')throw Error('Not a compatible DailyForm backup.');
-  const allowed=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY,'dailyform-exercise-drafts-v1','dailyform-timer-preferences-v1'];
+  const allowed=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY,'dailyform-exercise-drafts-v1','dailyform-timer-preferences-v1','dailyform-phase12-v1'];
   const items=allowed.filter(k=>Object.prototype.hasOwnProperty.call(obj.storage,k)).map(k=>[k,obj.storage[k]]);
   if(!items.length)throw Error('No supported records in this backup.');
   for(const [key,value] of items){if(!value||typeof value!=='object'||Array.isArray(value)!==(key===TEMPLATES_KEY))throw Error('Invalid data for '+key)}
