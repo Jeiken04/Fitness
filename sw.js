@@ -1,7 +1,7 @@
 /* DailyForm Android offline app shell. Never intercepts data export or localStorage. */
 'use strict';
-const CACHE = 'dailyform-android-shell-v13';
-const CORE = ['index.html','style.css?v=13-phase21','app.js?v=13-phase21','navigation.js?v=13-phase21','phase1.js?v=13-phase21','polish.js?v=13-phase21','phase12.js?v=13-phase21','unified.js?v=13-phase21','android.js?v=13-phase21','phase20.js?v=13-phase21','phase21.js?v=13-phase21','manifest.json?v=13-phase21','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png'];
+const CACHE = 'dailyform-android-shell-v14';
+const CORE = ['index.html','style.css?v=14-phase22','app.js?v=14-phase22','navigation.js?v=14-phase22','phase1.js?v=14-phase22','polish.js?v=14-phase22','phase12.js?v=14-phase22','unified.js?v=14-phase22','android.js?v=14-phase22','phase20.js?v=14-phase22','phase21.js?v=14-phase22','phase22.js?v=14-phase22','manifest.json?v=14-phase22','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png'];
 const root = new URL('./', self.registration.scope);
 const urls = CORE.map(path => new URL(path, root).href);
 self.addEventListener('install', event => {
