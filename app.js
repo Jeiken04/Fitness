@@ -86,7 +86,7 @@ function logWorkout(type) {
   }
   if (!records[selectedDate]) records[selectedDate] = {};
   records[selectedDate][type] = { duration, metric, notes, updatedAt: new Date().toISOString() };
-  saveRecords();
+  if(!saveRecords()){records=loadRecords();return;}
   render();
 }
 function renderHistory() {
@@ -121,7 +121,7 @@ document.getElementById('historyList').addEventListener('click', event => {
   if (!confirm(`Delete the ${labels[type]} session from ${formatDate(date)}?`)) return;
   delete records[date][type];
   if (!Object.keys(records[date]).length) delete records[date];
-  saveRecords();
+  if(!saveRecords()){records=loadRecords();return;}
   render();
 });
 
@@ -138,7 +138,7 @@ document.getElementById('dailyChecklist').addEventListener('change',e=>{
  if(e.target.checked) records[selectedDate][type]={duration:0,metric:'',notes:'',updatedAt:new Date().toISOString()};
  else delete records[selectedDate][type];
  if(!Object.keys(records[selectedDate]).length)delete records[selectedDate];
- saveRecords();render();
+ if(!saveRecords()){records=loadRecords();return;}render();
 });
 function exerciseNotice(message){const el=document.getElementById('exerciseMessage');if(el)el.textContent=message;}
 function renderExercises(){

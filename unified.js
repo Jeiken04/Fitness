@@ -4,15 +4,47 @@ const $=id=>document.getElementById(id), KEY='dailyform-phase12-v1', LEGACY='dai
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??fallback}catch{return fallback}};
 const save=(key,obj)=>{try{const value=JSON.stringify(obj);localStorage.setItem(key,value);return localStorage.getItem(key)===value}catch{return false}};
+const clone=obj=>JSON.parse(JSON.stringify(obj));
 const notice=msg=>{$('unifiedFeedback').textContent=msg};
-let meta=read(META,{imported:{},draft:''});if(!meta||typeof meta!=='object')meta={imported:{},draft:''};if(!meta.imported||typeof meta.imported!=='object')meta.imported={};
+let meta=read(META,{imported:{},autoStrength:{},draft:''});if(!meta||typeof meta!=='object')meta={imported:{},draft:''};if(!meta.imported||typeof meta.imported!=='object')meta.imported={};if(!meta.autoStrength||typeof meta.autoStrength!=='object')meta.autoStrength={};
 let selectedName='';
 const day=()=>selectedDate;
 const phase=()=>{const obj=read(KEY,{});if(!obj.sets||typeof obj.sets!=='object')obj.sets={};return obj};
 const daySets=()=>phase().sets[day()]||[];
 const legacy=()=>read(LEGACY,{});
 const validDay=()=>day()<=dateKey(new Date());
-function writeSets(fn){if(!validDay()){notice('Choose today or a previous date to edit sets.');return false;}const obj=phase(),key=day();const arr=Array.isArray(obj.sets[key])?obj.sets[key]:[];obj.sets[key]=arr;fn(arr);if(!save(KEY,obj)){notice('Could not save. Check browser storage and try again.');return false;}if(typeof render==='function')render();draw();notice('✓ Saved to this browser.');return true;}
+function writeSets(fn){
+ if(!validDay()){notice('Choose today or a previous date to edit sets.');return false;}
+ const obj=phase(),key=day(),arr=Array.isArray(obj.sets[key])?obj.sets[key]:[];
+ const before=localStorage.getItem(KEY),beforeLegacy=localStorage.getItem(LEGACY),beforeMeta=localStorage.getItem(META);
+ const wasAuto=Boolean(meta.autoStrength?.[key]);
+ obj.sets[key]=arr;fn(arr);
+ if(!arr.length)delete obj.sets[key];
+ const completed=arr.filter(s=>s.done),names=new Set(completed.map(s=>String(s.exercise||'').toLowerCase()));
+ const legacyData=legacy(),dayRecord=legacyData[key]||{},prior=dayRecord.strength;
+ const auto=meta.autoStrength||{};
+ // Never overwrite a manually entered session. Only manage records created by this builder.
+ if(completed.length){
+   if(!prior||auto[key]){
+     dayRecord.strength={duration:prior?.duration||0,metric:String(names.size),notes:prior?.notes||'Completed detailed strength sets',updatedAt:new Date().toISOString()};
+     legacyData[key]=dayRecord;auto[key]=true;
+   }
+ }else if(auto[key]){
+   delete dayRecord.strength;delete auto[key];
+   if(!Object.keys(dayRecord).length)delete legacyData[key];else legacyData[key]=dayRecord;
+ }
+ meta.autoStrength=auto;
+ const needsLegacy=Boolean(completed.length&&(!prior||auto[key])||!completed.length&&wasAuto);
+ const ok=save(KEY,obj)&&(!needsLegacy||save(LEGACY,legacyData))&&save(META,meta);
+ if(!ok){
+   for(const [k,v] of [[KEY,before],[LEGACY,beforeLegacy],[META,beforeMeta]]){
+     try{if(v===null)localStorage.removeItem(k);else localStorage.setItem(k,v)}catch{}
+   }
+   notice('Save failed. Previous records were restored where possible. Export a backup and check browser storage.');return false;
+ }
+ if(needsLegacy){records=loadRecords();}
+ if(typeof render==='function')render();draw();notice('✓ Saved to this browser.');return true;
+}
 function groupSets(sets){const groups=new Map();sets.forEach((s,i)=>{const name=String(s.exercise||'Unnamed exercise').trim();const k=name.toLowerCase();if(!groups.has(k))groups.set(k,{name,rows:[]});groups.get(k).rows.push({s,i});});return [...groups.values()]}
 function draw(){const sets=daySets(),groups=groupSets(sets);$('unifiedWorkout').innerHTML=groups.length?groups.map(g=>`<article class="unified-exercise"><div class="unified-exercise-head"><h3>${escape(g.name)}</h3><small>${g.rows.filter(x=>x.s.done).length}/${g.rows.length} sets complete</small></div>${g.rows.map(({s,i},n)=>`<div class="unified-set"><label>Set <strong>${n+1}</strong></label><label>Weight (lb)<input type="number" min="0" max="2000" step="0.5" data-field="weight" data-i="${i}" value="${Number(s.weight)||0}"></label><label>Reps<input type="number" min="1" max="200" step="1" data-field="reps" data-i="${i}" value="${Number(s.reps)||1}"></label><label>Type<select data-field="type" data-i="${i}">${['working','warmup','dropset'].map(t=>`<option value="${t}" ${s.type===t?'selected':''}>${t==='warmup'?'Warm-up':t==='dropset'?'Drop set':'Working'}</option>`).join('')}</select></label><label>Done<input type="checkbox" data-field="done" data-i="${i}" ${s.done?'checked':''}></label><button class="v12-delete" data-remove="${i}" type="button" aria-label="Delete set">×</button></div>`).join('')}<div class="unified-actions"><button class="phase-btn" data-add="${escape(g.name)}" type="button">+ Add set</button><button class="phase-btn secondary" data-repeat="${escape(g.name)}" type="button">Repeat last set</button></div></article>`).join(''):'<div class="unified-empty">No strength sets yet. Add an exercise to get started.</div>';
 const completed=sets.filter(s=>s.done),volume=completed.filter(s=>s.type!=='warmup').reduce((a,s)=>a+(Number(s.weight)||0)*(Number(s.reps)||0),0);

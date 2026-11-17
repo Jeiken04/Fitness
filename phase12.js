@@ -12,7 +12,7 @@ const safe=s=>escapeHTML(String(s??''));
 const number=(v,min,max)=>{const n=Number(v);return v===''||!Number.isFinite(n)||n<min||n>max?null:n};
 const notice=(id,msg)=>{if($(id))$(id).textContent=msg};
 function persist(){if(!storeVerified(KEY,data))return false;return true;}
-function mutate(fn,feedback){const previous=JSON.stringify(data);fn();if(!persist()){data=JSON.parse(previous);if(feedback)notice(feedback,'Unable to save. Check browser storage.');return false;}renderAll();return true;}
+function mutate(fn,feedback){try{data=Object.assign(defaults(),JSON.parse(localStorage.getItem(KEY)||'{}'))}catch{}const previous=JSON.stringify(data);fn();if(!persist()){data=JSON.parse(previous);if(feedback)notice(feedback,'Unable to save. Check browser storage.');return false;}renderAll();return true;}
 const library=[['Bench press','Chest'],['Incline dumbbell press','Chest'],['Push-up','Chest'],['Cable fly','Chest'],['Pull-up','Back'],['Lat pulldown','Back'],['Barbell row','Back'],['Seated cable row','Back'],['Deadlift','Back'],['Back squat','Legs'],['Front squat','Legs'],['Leg press','Legs'],['Romanian deadlift','Legs'],['Lunge','Legs'],['Leg curl','Legs'],['Overhead press','Shoulders'],['Lateral raise','Shoulders'],['Face pull','Shoulders'],['Biceps curl','Arms'],['Hammer curl','Arms'],['Triceps pushdown','Arms'],['Skull crusher','Arms'],['Plank','Core'],['Hanging leg raise','Core'],['Cable crunch','Core'],['Russian twist','Core']];
 function allExercises(){return [...library,...data.custom.filter(x=>x&&typeof x.name==='string').map(x=>[x.name,x.group])];}
 function renderLibrary(){
@@ -82,7 +82,7 @@ function renderSummaries(){
  const cards=[['Strength',r.strength?`${r.strength.duration||0} min`:'No session logged',`${sets.length} completed sets · ${Math.round(volume).toLocaleString()} lb working volume`],['Cardio',cardio?`${cardio.duration||0} min · ${cardio.metric||0} mi`:'No session logged',`${safe(data.cardio[selectedDate]?.activity||'')} ${pace==='—'?'':'· '+pace}`],['Boxing',boxing?`${boxing.duration||0} min · ${boxing.metric||0} rounds`:'No session logged',`${safe(data.boxing[selectedDate]?.activity||'')} ${data.boxing[selectedDate]?.intensity?'· Intensity '+data.boxing[selectedDate].intensity+'/10':''}`]];
  $('sessionSummaryCards').innerHTML=cards.map(([title,headline,detail])=>`<article class="phase-panel"><span class="eyebrow">${title}</span><h3>${headline}</h3><p class="helper">${detail||'Add session details in the workout tab.'}</p></article>`).join('');
 }
-function renderAll(){renderSets();renderLibrary();renderDetailsHistory();renderPlanner();renderSummaries();}
+function renderAll(){try{data=Object.assign(defaults(),JSON.parse(localStorage.getItem(KEY)||'{}'))}catch{}renderSets();renderLibrary();renderDetailsHistory();renderPlanner();renderSummaries();}
 const previousRender=render;
 render=function(){previousRender();loadDetails();renderAll();};
 render();

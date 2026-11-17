@@ -39,7 +39,10 @@ $('templateList').addEventListener('click',e=>{
 });
 function strengthProgress(){
  const all=[];
- Object.entries(records).forEach(([date,day])=>{if(!Array.isArray(day?.exercises))return;day.exercises.forEach(e=>{if(e.type==='strength'&&e.name&&n(e.weight)>0)all.push({...e,date})})});
+ const detailed=(()=>{try{return JSON.parse(localStorage.getItem('dailyform-phase12-v1')||'{}').sets||{}}catch{return {}}})();
+ const markers=(()=>{try{return JSON.parse(localStorage.getItem('dailyform-unified-v1')||'{}').imported||{}}catch{return {}}})();
+ Object.entries(records).forEach(([date,day])=>{if(!Array.isArray(day?.exercises))return;day.exercises.forEach((e,i)=>{if(e.type==='strength'&&e.name&&n(e.weight)>0&&markers[date+'|'+i]!==JSON.stringify(e))all.push({...e,date})})});
+ Object.entries(detailed).forEach(([date,sets])=>{if(!Array.isArray(sets))return;sets.forEach(s=>{if(s?.done&&s.exercise&&n(s.weight)>0&&n(s.reps)>0)all.push({name:s.exercise,weight:s.weight,reps:s.reps,sets:1,date})})});
  const names=[...new Set(all.map(e=>e.name.trim()))].sort((a,b)=>a.localeCompare(b));
  const select=$('progressExercise'),current=select.value;
  select.innerHTML='<option value="">Choose an exercise</option>'+names.map(name=>`<option value="${escapeHTML(name)}">${escapeHTML(name)}</option>`).join('');
@@ -76,11 +79,16 @@ $('importBackup').addEventListener('change',async e=>{
  try{
   if(file.size>5_000_000)throw Error('File too large (maximum 5 MB).');
   const obj=JSON.parse(await file.text());
-  if(obj.format!=='dailyform-backup'||obj.version!==1||!obj.storage||typeof obj.storage!=='object')throw Error('Not a compatible DailyForm backup.');
+  if(obj.format!=='dailyform-backup'||obj.version!==1||!obj.storage||typeof obj.storage!=='object'||Array.isArray(obj.storage))throw Error('Not a compatible DailyForm backup.');
   const allowed=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY,'dailyform-exercise-drafts-v1','dailyform-timer-preferences-v1','dailyform-phase12-v1','dailyform-unified-v1'];
   const items=allowed.filter(k=>Object.prototype.hasOwnProperty.call(obj.storage,k)).map(k=>[k,obj.storage[k]]);
   if(!items.length)throw Error('No supported records in this backup.');
-  for(const [key,value] of items){if(!value||typeof value!=='object'||Array.isArray(value)!==(key===TEMPLATES_KEY))throw Error('Invalid data for '+key)}
+  for(const [key,value] of items){
+   if(!value||typeof value!=='object'||Array.isArray(value)!==(key===TEMPLATES_KEY))throw Error('Invalid data for '+key);
+   if(key===STORAGE_KEY&&Object.entries(value).some(([day,record])=>!/^\d{4}-\d{2}-\d{2}$/.test(day)||!record||typeof record!=='object'||Array.isArray(record)))throw Error('Invalid workout history.');
+   if(key==='dailyform-phase12-v1'&&['sets','cardio','boxing','planner'].some(k=>value[k]!==undefined&&(!value[k]||typeof value[k]!=='object'||Array.isArray(value[k]))))throw Error('Invalid advanced workout data.');
+   if(key==='dailyform-unified-v1'&&value.imported!==undefined&&(!value.imported||typeof value.imported!=='object'||Array.isArray(value.imported)))throw Error('Invalid strength import markers.');
+  }
   if(!confirm('Replace this device’s workout, weight and template records with the backup? Export your current data first.'))return;
   const previous=new Map(allowed.map(k=>[k,localStorage.getItem(k)]));
   try{items.forEach(([key,value])=>{if(!storeVerified(key,value))throw Error('Storage verification failed.');});}
