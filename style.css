@@ -51,3 +51,16 @@
 
 /* Phase 2.2 */
 .p22 .phase-panel{margin-bottom:14px}.p22 .p22-day{border:1px solid var(--border, #34483d);border-radius:12px;padding:14px;margin:10px 0}.p22 .p22-meal{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:9px 0;flex-wrap:wrap}.p22 .p22-meal button{flex-shrink:0}.p22 .p22-grocery{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}.p22 .p22-grocery label{display:flex;gap:8px;align-items:center}.p22 .p22-note{font-size:.83rem;opacity:.8}.p22 .p22-tag{font-size:.8rem;opacity:.75}
+
+/* Recipe cooking details */
+.p23-recipe-detail { padding: 1rem 0; line-height: 1.65; }
+.p23-recipe-detail h4,.p23-recipe-detail h5 { margin: .6rem 0; }
+.p23-recipe-detail li { margin-bottom: .55rem; }
+.p23-meal-actions { display:inline-flex; gap:.4rem; flex-wrap:wrap; }
+#p23RecipeViewer { scroll-margin-top: 1rem; }
+
+/* Recipe timing and serving controls */
+.p23-recipe-stats{display:flex;flex-wrap:wrap;gap:.5rem;margin:.8rem 0}
+.p23-recipe-stats span{padding:.45rem .7rem;border:1px solid var(--border, #355343);border-radius:.65rem;font-size:.88rem}
+.p23-serving-control{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin:.8rem 0}
+.p23-serving-control input{max-width:7rem}
