@@ -1,0 +1,71 @@
+
+/* DailyForm Phase 2.4 — visual refinement, no storage or calculation changes */
+:root{--bg:#0c130f;--panel:#17221a;--panel2:#1e2d23;--line:#304235;--muted:#a8b7ab;--lime:#d0fa82;--focus:#d0fa82}
+body{background:radial-gradient(ellipse 65% 34% at 90% -5%,rgba(99,155,84,.12),transparent),var(--bg);line-height:1.5}
+.sidebar{background:linear-gradient(180deg,#142019,#101912);border-right-color:#2a4030;box-shadow:8px 0 40px #00000012}
+.brand-mark{box-shadow:0 6px 24px #c7f36b2c}
+.nav-item{border:1px solid transparent;transition:background .16s,color .16s,border-color .16s,transform .16s;cursor:pointer}
+.nav-item:hover{background:#23372a;border-color:#36513d;transform:translateX(2px)}
+.nav-item.active{background:linear-gradient(90deg,#30452e,#223428);border-color:#4b6c41;color:#e1ffac;font-weight:700;box-shadow:inset 3px 0 0 var(--lime)}
+.main-content{max-width:1650px;padding-top:32px}
+.topbar{padding:0 0 23px;border-bottom:1px solid #2c3c30;margin-bottom:28px}
+.topbar h1{letter-spacing:-1.5px}
+.tab-heading{margin-bottom:23px}
+.tab-heading h2{letter-spacing:-.8px}
+.tab-heading p,.helper{line-height:1.7}
+.hero-card{border-radius:18px;box-shadow:0 12px 38px #0002}
+.stat-card,.workout-card,.phase-panel,.p20-kpi,.p22-day{border-radius:15px}
+.stat-card,.workout-card,.phase-panel,.p20-kpi{box-shadow:0 8px 24px #00000012}
+.phase-panel{border-color:#334b39}
+.section-heading h2{letter-spacing:-.6px}
+button,select,input,textarea{font-family:inherit}
+button{transition:background-color .16s,border-color .16s,transform .16s,box-shadow .16s}
+button:not(:disabled){cursor:pointer}
+button:not(:disabled):active{transform:scale(.985)}
+button:disabled{opacity:.5;cursor:not-allowed}
+:where(button,input,textarea,select,a,[tabindex]):focus-visible{outline:3px solid var(--focus)!important;outline-offset:3px}
+input,textarea,select{accent-color:var(--lime);max-width:100%}
+input:not([type=checkbox]):not([type=radio]),textarea,select{border-radius:9px}
+input:not([type=checkbox]):not([type=radio]):focus,textarea:focus,select:focus{border-color:#b2e776!important;box-shadow:0 0 0 3px #b2e77622;outline:none}
+.phase-btn,.today-button{border-radius:9px}
+.phase-btn:not(.secondary):hover{filter:brightness(1.08)}
+.p20-kpi strong{letter-spacing:-.7px}
+.p20-meter{height:9px}
+.p20-meter i{background:linear-gradient(90deg,#85bf55,var(--lime))}
+.p22 .phase-panel{padding:clamp(15px,2.2vw,24px);margin-bottom:18px}
+.p22 .phase-panel h3{margin-top:0}
+.p22 .p22-day{background:linear-gradient(145deg,#1b2b20,#16231b);border-color:#3a5640;margin:14px 0;padding:clamp(12px,2vw,20px)}
+.p22 .p22-meal{padding:10px 0;border-bottom:1px solid #344a38}
+.p22 .p22-meal:last-child{border-bottom:0}
+.p22 .p22-grocery{padding:9px 11px;border-radius:10px}
+.p22 .p22-grocery:nth-child(even){background:#ffffff06}
+.p22 .p22-grocery input[type=checkbox]{width:18px;height:18px;accent-color:var(--lime)}
+.p23-recipe-list .phase-item{border-radius:11px;transition:background .15s,border-color .15s}
+.p23-recipe-list .phase-item:hover{background:#233629;border-color:#567a4c}
+.p23-recipe-stats span{background:#253b2a;border-color:#436245;color:#e4f4dc}
+#p23RecipeViewer{border:1px solid #4b6b4a;border-radius:14px;padding:15px;background:#18291e}
+#p23RecipeDetail:not([hidden]){animation:p24Reveal .22s ease-out}
+@keyframes p24Reveal{from{opacity:.4;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.p24-jumpbar{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 22px}
+.p24-jumpbar a{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;background:#1c2d21;border:1px solid #38543c;border-radius:100px;color:#d5e5d4;font-size:12px;font-weight:700;text-decoration:none;transition:background .16s,border-color .16s}
+.p24-jumpbar a:hover{background:#2c4530;border-color:#a2d96e}
+.p24-jumpbar a:focus-visible{outline:3px solid var(--lime)}
+.p24-tip{padding:12px 15px;border:1px solid #38553c;border-radius:11px;background:#1a2b20;color:#c4d6c6;font-size:12px;line-height:1.6;margin-bottom:18px}
+.p24-tip strong{color:var(--lime)}
+.p24-section-anchor{scroll-margin-top:18px}
+.p24-backtop{position:fixed;right:22px;bottom:22px;z-index:9;border:1px solid #587d4c;background:#253e2b;color:#edffd9;border-radius:100px;padding:11px 16px;box-shadow:0 8px 25px #0005;font-weight:700;font-size:12px}
+.p24-backtop[hidden]{display:none!important}
+@media(min-width:1050px){.p22 .p20-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}}
+@media(max-width:900px){.p24-backtop{bottom:78px;right:14px}.topbar{gap:15px}}
+@media(max-width:600px){
+ .main-content{padding-left:15px;padding-right:15px}
+ .topbar{align-items:flex-start;gap:14px}
+ .topbar h1{font-size:26px}
+ .p22 .phase-panel{padding:14px}
+ .p24-jumpbar{gap:6px}
+ .p24-jumpbar a{padding:9px 10px;font-size:11px}
+ .p22 .p22-meal{align-items:flex-start}
+ .p22 .p22-meal button{min-height:38px}
+ .p24-backtop{right:12px;bottom:75px}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
