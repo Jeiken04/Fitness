@@ -1,7 +1,7 @@
 /* DailyForm Android offline app shell. Never intercepts data export or localStorage. */
 'use strict';
-const CACHE = 'dailyform-android-shell-v20';
-const CORE = ['index.html','style.css?v=20-phase24','phase24.css?v=20-phase24','phase24.js?v=20-phase24','app.js?v=20-phase24','navigation.js?v=20-phase24','phase1.js?v=20-phase24','polish.js?v=20-phase24','phase12.js?v=20-phase24','unified.js?v=20-phase24','android.js?v=20-phase24','phase20.js?v=20-phase24','phase21.js?v=20-phase24','phase22.js?v=20-phase24','manifest.json?v=20-phase24','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png'];
+const CACHE = 'dailyform-android-shell-v21';
+const CORE = ['index.html','style.css?v=21-phase245','phase24.css?v=21-phase245','phase24.js?v=21-phase245','app.js?v=21-phase245','navigation.js?v=21-phase245','phase1.js?v=21-phase245','polish.js?v=21-phase245','phase12.js?v=21-phase245','unified.js?v=21-phase245','android.js?v=21-phase245','phase20.js?v=21-phase245','phase21.js?v=21-phase245','phase22.js?v=21-phase245','activity.css?v=21-phase245','activity.js?v=21-phase245','manifest.json?v=21-phase245','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png'];
 const root = new URL('./', self.registration.scope);
 const urls = CORE.map(path => new URL(path, root).href);
 self.addEventListener('install', event => {
