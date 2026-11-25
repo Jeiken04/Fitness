@@ -70,14 +70,14 @@ function cardioProgress(){
 
 function backup(){
  const keys=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY,'dailyform-exercise-drafts-v1','dailyform-timer-preferences-v1','dailyform-phase12-v1','dailyform-unified-v1','dailyform-phase20-v1','dailyform-phase21-v1','dailyform-phase22-v1','dailyform-watch-activity-v1','dailyform-boxing-studio-v1','dailyform-boxing-programs-v1'];const data={format:'dailyform-backup',version:1,exportedAt:new Date().toISOString(),storage:{}};
- keys.forEach(key=>{const value=localStorage.getItem(key);if(value!==null)data.storage[key]=JSON.parse(value)});
+ keys.forEach(key=>{const value=localStorage.getItem(key);if(value!==null){try{data.storage[key]=JSON.parse(value)}catch{throw Error('Cannot safely export: stored data for '+key+' is not valid JSON. Your original data was not changed.')}}});
  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`dailyform-backup-${dateKey(new Date())}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 $('exportBackup').addEventListener('click',()=>{try{backup();notice('backupFeedback','Backup downloaded. Keep it somewhere safe.')}catch(err){notice('backupFeedback','Backup failed: '+err.message)}});
 $('importBackup').addEventListener('change',async e=>{
  const file=e.target.files?.[0];if(!file)return;
  try{
-  if(file.size>5_000_000)throw Error('File too large (maximum 5 MB).');
+  if(file.size>20_000_000)throw Error('File too large (maximum 20 MB).');
   const obj=JSON.parse(await file.text());
   if(obj.format!=='dailyform-backup'||obj.version!==1||!obj.storage||typeof obj.storage!=='object'||Array.isArray(obj.storage))throw Error('Not a compatible DailyForm backup.');
   const allowed=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY,'dailyform-exercise-drafts-v1','dailyform-timer-preferences-v1','dailyform-phase12-v1','dailyform-unified-v1','dailyform-phase20-v1','dailyform-phase21-v1','dailyform-phase22-v1','dailyform-watch-activity-v1','dailyform-boxing-studio-v1','dailyform-boxing-programs-v1'];
@@ -90,7 +90,8 @@ $('importBackup').addEventListener('change',async e=>{
    if(key==='dailyform-phase20-v1'&&(['targets','nutrition','measurements'].some(k=>value[k]!==undefined&&(!value[k]||typeof value[k]!=='object'||Array.isArray(value[k])))||Object.keys(value.nutrition||{}).some(d=>!/^\d{4}-\d{2}-\d{2}$/.test(d))||Object.keys(value.measurements||{}).some(d=>!/^\d{4}-\d{2}-\d{2}$/.test(d))))throw Error('Invalid nutrition or measurement data.');
    if(key==='dailyform-unified-v1'&&value.imported!==undefined&&(!value.imported||typeof value.imported!=='object'||Array.isArray(value.imported)))throw Error('Invalid strength import markers.');
   }
-  if(!confirm('Replace this device’s workout, weight and template records with the backup? Export your current data first.'))return;
+  const preview=items.map(([key,value])=>key+': '+(Array.isArray(value)?value.length:Object.keys(value).length)+' entries').join('\n');
+  if(!confirm('Restore '+items.length+' data categories from '+(obj.exportedAt||'an undated backup')+'?\n\n'+preview+'\n\nMatching categories on this device will be replaced. Export your current data first.'))return;
   const previous=new Map(allowed.map(k=>[k,localStorage.getItem(k)]));
   try{items.forEach(([key,value])=>{if(!storeVerified(key,value))throw Error('Storage verification failed.');});}
   catch(err){previous.forEach((value,key)=>{try{if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value)}catch{}});throw err}

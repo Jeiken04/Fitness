@@ -1,7 +1,7 @@
 /* DailyForm Android offline app shell. Never intercepts data export or localStorage. */
 'use strict';
-const CACHE = 'dailyform-android-shell-v24';
-const CORE = ['index.html','style.css?v=24-boxing-subtabs','phase24.css?v=24-boxing-subtabs','phase24.js?v=24-boxing-subtabs','app.js?v=24-boxing-subtabs','navigation.js?v=24-boxing-subtabs','phase1.js?v=24-boxing-subtabs','polish.js?v=24-boxing-subtabs','phase12.js?v=24-boxing-subtabs','unified.js?v=24-boxing-subtabs','android.js?v=24-boxing-subtabs','phase20.js?v=24-boxing-subtabs','phase21.js?v=24-boxing-subtabs','phase22.js?v=24-boxing-subtabs','activity.css?v=24-boxing-subtabs','activity.js?v=24-boxing-subtabs','boxing-studio.css?v=24-boxing-subtabs','boxing-studio.js?v=24-boxing-subtabs','boxing-programs.js?v=24-boxing-subtabs','boxing-programs.css?v=24-boxing-subtabs','boxing-tabs.js?v=24-boxing-subtabs','manifest.json?v=24-boxing-subtabs','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png'];
+const CACHE = 'dailyform-android-shell-v26a';
+const CORE = ['index.html','style.css?v=26a-stability','phase24.css?v=26a-stability','phase24.js?v=26a-stability','app.js?v=26a-stability','navigation.js?v=26a-stability','phase1.js?v=26a-stability','polish.js?v=26a-stability','phase12.js?v=26a-stability','unified.js?v=26a-stability','android.js?v=26a-stability','phase20.js?v=26a-stability','phase21.js?v=26a-stability','phase22.js?v=26a-stability','activity.css?v=26a-stability','activity.js?v=26a-stability','boxing-studio.css?v=26a-stability','boxing-studio.js?v=26a-stability','boxing-programs.js?v=26a-stability','boxing-programs.css?v=26a-stability','boxing-tabs.js?v=26a-stability','storage-health.js?v=26a-stability','manifest.json?v=26a-stability','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png'];
 const root = new URL('./', self.registration.scope);
 const urls = CORE.map(path => new URL(path, root).href);
 self.addEventListener('install', event => {
