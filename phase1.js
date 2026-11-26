@@ -81,20 +81,10 @@ $('importBackup').addEventListener('change',async e=>{
   const obj=JSON.parse(await file.text());
   if(obj.format!=='dailyform-backup'||obj.version!==1||!obj.storage||typeof obj.storage!=='object'||Array.isArray(obj.storage))throw Error('Not a compatible DailyForm backup.');
   const allowed=[STORAGE_KEY,WEIGHT_KEY,TEMPLATES_KEY,'dailyform-exercise-drafts-v1','dailyform-timer-preferences-v1','dailyform-phase12-v1','dailyform-unified-v1','dailyform-phase20-v1','dailyform-phase21-v1','dailyform-phase22-v1','dailyform-watch-activity-v1','dailyform-boxing-studio-v1','dailyform-boxing-programs-v1'];
-  const items=allowed.filter(k=>Object.prototype.hasOwnProperty.call(obj.storage,k)).map(k=>[k,obj.storage[k]]);
-  if(!items.length)throw Error('No supported records in this backup.');
-  for(const [key,value] of items){
-   if(!value||typeof value!=='object'||Array.isArray(value)!==(key===TEMPLATES_KEY))throw Error('Invalid data for '+key);
-   if(key===STORAGE_KEY&&Object.entries(value).some(([day,record])=>!/^\d{4}-\d{2}-\d{2}$/.test(day)||!record||typeof record!=='object'||Array.isArray(record)))throw Error('Invalid workout history.');
-   if(key==='dailyform-phase12-v1'&&['sets','cardio','boxing','planner'].some(k=>value[k]!==undefined&&(!value[k]||typeof value[k]!=='object'||Array.isArray(value[k]))))throw Error('Invalid advanced workout data.');
-   if(key==='dailyform-phase20-v1'&&(['targets','nutrition','measurements'].some(k=>value[k]!==undefined&&(!value[k]||typeof value[k]!=='object'||Array.isArray(value[k])))||Object.keys(value.nutrition||{}).some(d=>!/^\d{4}-\d{2}-\d{2}$/.test(d))||Object.keys(value.measurements||{}).some(d=>!/^\d{4}-\d{2}-\d{2}$/.test(d))))throw Error('Invalid nutrition or measurement data.');
-   if(key==='dailyform-unified-v1'&&value.imported!==undefined&&(!value.imported||typeof value.imported!=='object'||Array.isArray(value.imported)))throw Error('Invalid strength import markers.');
-  }
+  const items=DailyFormBackupSecurity.validate(obj,allowed);
   const preview=items.map(([key,value])=>key+': '+(Array.isArray(value)?value.length:Object.keys(value).length)+' entries').join('\n');
   if(!confirm('Restore '+items.length+' data categories from '+(obj.exportedAt||'an undated backup')+'?\n\n'+preview+'\n\nMatching categories on this device will be replaced. Export your current data first.'))return;
-  const previous=new Map(allowed.map(k=>[k,localStorage.getItem(k)]));
-  try{items.forEach(([key,value])=>{if(!storeVerified(key,value))throw Error('Storage verification failed.');});}
-  catch(err){previous.forEach((value,key)=>{try{if(value===null)localStorage.removeItem(key);else localStorage.setItem(key,value)}catch{}});throw err}
+  DailyFormBackupSecurity.restore(localStorage,items);
   notice('backupFeedback','Backup restored. Reloading…');location.reload();
  }catch(err){notice('backupFeedback','Import failed: '+err.message)}finally{e.target.value=''}
 });

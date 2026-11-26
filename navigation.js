@@ -5,12 +5,13 @@
   const valid = new Set(tabs.map(el => el.dataset.tab));
   function show(tab, updateHash=true) {
     if (!valid.has(tab)) tab = 'dashboard';
-    tabs.forEach(el => {const active=el.dataset.tab===tab;el.classList.toggle('active',active);el.setAttribute('aria-selected',String(active));});
+    tabs.forEach(el => {const active=el.dataset.tab===tab;el.classList.toggle('active',active);el.setAttribute('aria-selected',String(active));el.tabIndex=active?0:-1;});
     panels.forEach(el => {el.hidden = el.dataset.panel !== tab;});
     if (updateHash) history.replaceState(null,'','#'+tab);
     window.scrollTo({top:0,behavior:'instant'});
   }
   tabs.forEach(el => el.addEventListener('click',() => show(el.dataset.tab)));
+  tabs.forEach((el,i)=>el.addEventListener('keydown',event=>{let n;if(['ArrowRight','ArrowDown'].includes(event.key))n=(i+1)%tabs.length;else if(['ArrowLeft','ArrowUp'].includes(event.key))n=(i+tabs.length-1)%tabs.length;else if(event.key==='Home')n=0;else if(event.key==='End')n=tabs.length-1;else return;event.preventDefault();show(tabs[n].dataset.tab);tabs[n].focus();}));
   document.querySelector('.brand')?.addEventListener('click', e => {e.preventDefault();show('dashboard');});
   window.addEventListener('hashchange',()=>show(location.hash.slice(1),false));
   const legacy = {'overview':'dashboard','workouts':'dashboard','checklist':'dashboard','exercise-log':'strength','insights':'progress','progress-dashboard':'progress','weight-loss':'weight','calendar-section':'history'};

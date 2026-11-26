@@ -2,6 +2,7 @@
 (() => {
 'use strict';
 const $ = id => document.getElementById(id);
+const text=(id,value)=>{const el=$(id);if(el.textContent!==value)el.textContent=value;};
 const PREF_KEY='dailyform-timer-preferences-v1';
 const DRAFT_KEY='dailyform-exercise-drafts-v1';
 const fields=['exerciseType','exerciseName','exerciseSets','exerciseReps','exerciseWeight'];
@@ -22,19 +23,19 @@ const clamp=(v,min,max,fallback)=>{const n=Number(v);return Number.isFinite(n)?M
 function setupRest(){
  let remaining=90000,deadline=0,running=false,handle=null,lastSec=90;
  const duration=()=>clamp($('restSeconds').value,1,3600,90)*1000;
- const paint=()=>{$('restDisplay').textContent=clock(seconds(remaining));$('restStart').textContent=running?'Pause':remaining<=0?'Restart':remaining===duration()?'Start':'Resume';$('restStatus').textContent=running?'Resting · timer running':remaining<=0?'Rest complete':remaining===duration()?'Ready for your next set':'Paused · resume when ready'};
+ const paint=()=>{text('restDisplay',clock(seconds(remaining)));text('restStart',running?'Pause':remaining<=0?'Restart':remaining===duration()?'Start':'Resume');text('restStatus',running?'Resting · timer running':remaining<=0?'Rest complete':remaining===duration()?'Ready for your next set':'Paused · resume when ready')};
  const stop=()=>{running=false;clearInterval(handle);handle=null};
  const tick=()=>{if(!running)return;const before=lastSec;remaining=Math.max(0,deadline-Date.now());const now=seconds(remaining);if(now<before&&now>0&&now<=3)cue('tick');lastSec=now;if(remaining<=0){stop();cue('finish')}paint()};
  const reset=()=>{stop();remaining=duration();lastSec=seconds(remaining);paint()};
- $('restStart').addEventListener('click',()=>{unlockAudio();if(running){tick();stop();paint();return}if(remaining<=0)remaining=duration();deadline=Date.now()+remaining;lastSec=seconds(remaining);running=true;handle=setInterval(tick,120);paint()});
+ $('restStart').addEventListener('click',()=>{unlockAudio();if(running){tick();stop();paint();return}if(remaining<=0)remaining=duration();deadline=Date.now()+remaining;lastSec=seconds(remaining);running=true;handle=setInterval(tick,250);paint()});
  $('restReset').addEventListener('click',reset);$('restSeconds').addEventListener('change',reset);reset();
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});window.addEventListener('pageshow',tick);
 }
 function setupBoxing(){
  let round=1,stage='round',remaining=180000,deadline=0,running=false,handle=null,lastSec=180;
  const settings=()=>({rounds:clamp($('boxingTimerRounds').value,1,30,6),roundMs:clamp($('boxingRoundSeconds').value,10,1800,180)*1000,restMs:clamp($('boxingRestSeconds').value,0,600,60)*1000});
  const stop=()=>{running=false;clearInterval(handle);handle=null};
- const paint=()=>{$('boxingTimerDisplay').textContent=clock(seconds(remaining));$('boxingTimerStatus').textContent=stage==='done'?'Workout complete':`${stage==='round'?'Round':'Rest after round'} ${round} / ${settings().rounds} · ${running?'Running':'Paused'}`;$('boxingTimerStart').textContent=running?'Pause':stage==='done'?'Restart':remaining===settings().roundMs&&round===1&&stage==='round'?'Start':'Resume'};
+ const paint=()=>{text('boxingTimerDisplay',clock(seconds(remaining)));text('boxingTimerStatus',stage==='done'?'Workout complete':`${stage==='round'?'Round':'Rest after round'} ${round} / ${settings().rounds} · ${running?'Running':'Paused'}`);text('boxingTimerStart',running?'Pause':stage==='done'?'Restart':remaining===settings().roundMs&&round===1&&stage==='round'?'Start':'Resume')};
  const reset=()=>{stop();round=1;stage='round';remaining=settings().roundMs;lastSec=seconds(remaining);paint()};
  const tick=()=>{
   if(!running)return;
@@ -54,10 +55,10 @@ function setupBoxing(){
   }
   paint();
  };
- $('boxingTimerStart').addEventListener('click',()=>{unlockAudio();if(running){tick();stop();paint();return}if(stage==='done')reset();deadline=Date.now()+remaining;lastSec=seconds(remaining);running=true;handle=setInterval(tick,120);if(stage==='round'&&round===1&&remaining===settings().roundMs)cue('start');paint()});
+ $('boxingTimerStart').addEventListener('click',()=>{unlockAudio();if(running){tick();stop();paint();return}if(stage==='done')reset();deadline=Date.now()+remaining;lastSec=seconds(remaining);running=true;handle=setInterval(tick,250);if(stage==='round'&&round===1&&remaining===settings().roundMs)cue('start');paint()});
  $('boxingTimerReset').addEventListener('click',reset);
  for(const id of ['boxingTimerRounds','boxingRoundSeconds','boxingRestSeconds'])$(id).addEventListener('change',reset);
- document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});reset();
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});window.addEventListener('pageshow',tick);reset();
 }
 setupRest();setupBoxing();
 // Date-scoped drafts are stored separately from saved exercise logs.

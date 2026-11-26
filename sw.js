@@ -1,14 +1,14 @@
 /* DailyForm Android offline app shell. Never intercepts data export or localStorage. */
 'use strict';
-const CACHE = 'dailyform-android-shell-v26a';
-const CORE = ['index.html','style.css?v=26a-stability','phase24.css?v=26a-stability','phase24.js?v=26a-stability','app.js?v=26a-stability','navigation.js?v=26a-stability','phase1.js?v=26a-stability','polish.js?v=26a-stability','phase12.js?v=26a-stability','unified.js?v=26a-stability','android.js?v=26a-stability','phase20.js?v=26a-stability','phase21.js?v=26a-stability','phase22.js?v=26a-stability','activity.css?v=26a-stability','activity.js?v=26a-stability','boxing-studio.css?v=26a-stability','boxing-studio.js?v=26a-stability','boxing-programs.js?v=26a-stability','boxing-programs.css?v=26a-stability','boxing-tabs.js?v=26a-stability','storage-health.js?v=26a-stability','manifest.json?v=26a-stability','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png'];
+const CACHE = 'dailyform-android-shell-v26c';
+const CORE = ['index.html','backup-security.js?v=26c-security','reliability.js?v=26c-security','reliability.css?v=26c-security','style.css?v=26c-security','phase24.css?v=26c-security','phase24.js?v=26c-security','app.js?v=26c-security','navigation.js?v=26c-security','phase1.js?v=26c-security','polish.js?v=26c-security','phase12.js?v=26c-security','unified.js?v=26c-security','android.js?v=26c-security','phase20.js?v=26c-security','phase21.js?v=26c-security','phase22.js?v=26c-security','activity.css?v=26c-security','activity.js?v=26c-security','boxing-studio.css?v=26c-security','boxing-studio.js?v=26c-security','boxing-programs.js?v=26c-security','boxing-programs.css?v=26c-security','boxing-tabs.js?v=26c-security','storage-health.js?v=26c-security','manifest.json?v=26c-security','icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png'];
 const root = new URL('./', self.registration.scope);
 const urls = CORE.map(path => new URL(path, root).href);
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE);
-    await cache.addAll(urls);
-    await self.skipWaiting();
+    await cache.addAll(urls.map(url=>new Request(url,{cache:"reload"})));
+    // Wait for existing app windows to close before activating.
   })());
 });
 self.addEventListener('activate', event => {
@@ -25,10 +25,8 @@ self.addEventListener('fetch', event => {
   if (!url.pathname.startsWith(root.pathname)) return;
   if (request.mode === 'navigate') {
     event.respondWith((async () => {
-      try {return await fetch(request);} catch {
-        const cache = await caches.open(CACHE);
-        return (await cache.match(new URL('index.html', root).href)) || Response.error();
-      }
+      const cache = await caches.open(CACHE);
+      return (await cache.match(new URL('index.html', root).href)) || fetch(request);
     })());
     return;
   }

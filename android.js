@@ -28,11 +28,4 @@
     } catch { say('Use Chrome’s menu to install DailyForm.'); }
   });
   window.addEventListener('appinstalled', () => {installPrompt=null;if(button)button.hidden=true;say('DailyForm installed successfully.');});
-  if (!('serviceWorker' in navigator)) {say('This Android browser does not support offline app installation.');return;}
-  if (!window.isSecureContext) {say('Android offline support requires HTTPS (or localhost). Your workouts still work normally.');return;}
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js', {scope:'./'}).catch(() => {
-      say('Offline setup could not complete. Check HTTPS and reload while online.');
-    });
-  });
 })();

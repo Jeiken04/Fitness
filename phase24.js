@@ -41,7 +41,7 @@
   topButton.hidden=true;
   document.body.appendChild(topButton);
   topButton.addEventListener('click',()=>window.scrollTo({top:0,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}));
-  const refresh=()=>{topButton.hidden=window.scrollY<480;};
+  let pending=false;const refresh=()=>{if(pending)return;pending=true;requestAnimationFrame(()=>{pending=false;const hidden=window.scrollY<480;if(topButton.hidden!==hidden)topButton.hidden=hidden;});};
   window.addEventListener('scroll',refresh,{passive:true});
   refresh();
 })();

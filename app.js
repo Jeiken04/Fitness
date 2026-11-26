@@ -53,7 +53,7 @@ function render() {
     const card = document.querySelector(`[data-type="${type}"]`);
     const entry = data[type];
     card.classList.toggle('is-done', Boolean(entry));
-    document.getElementById(`${type}Saved`).textContent = entry ? `✓ Saved · ${entry.duration || 0} min` : '✓ Session saved';
+    document.getElementById(`${type}Saved`).textContent = entry ? `✓ Saved · ${escapeHTML(entry.duration || 0)} min` : '✓ Session saved';
     const button = card.querySelector('.complete-button');
     button.innerHTML = entry ? '<span>✓</span> Update session' : '<span>＋</span> Log ' + labels[type].toLowerCase() + ' session';
     const fields = type === 'strength' ? ['Duration','Exercises','Notes'] : type === 'cardio' ? ['Duration','Distance','Notes'] : ['Duration','Rounds','Notes'];
@@ -103,7 +103,7 @@ function renderHistory() {
   }
   container.innerHTML = entries.slice(0,30).map((entry,index) => {
     const metricLabel = entry.type === 'strength' ? `${entry.metric || '—'} exercises` : entry.type === 'cardio' ? `${entry.metric || '—'} mi` : `${entry.metric || '—'} rounds`;
-    return `<div class="history-entry"><span class="history-date">${formatDate(entry.date,{month:'short',day:'numeric',year:'numeric'})}</span><div class="history-detail"><strong>${labels[entry.type]}</strong><p>${escapeHTML(entry.notes || 'Session logged')} · ${metricLabel}</p></div><span class="history-meta">${entry.duration || 0} MIN <button class="delete-entry" data-delete="${entry.date}|${entry.type}" aria-label="Delete ${labels[entry.type]} session">×</button></span></div>`;
+    return `<div class="history-entry"><span class="history-date">${formatDate(entry.date,{month:'short',day:'numeric',year:'numeric'})}</span><div class="history-detail"><strong>${escapeHTML(labels[entry.type]||"Workout")}</strong><p>${escapeHTML(entry.notes || 'Session logged')} · ${escapeHTML(metricLabel)}</p></div><span class="history-meta">${escapeHTML(entry.duration || 0)} MIN <button class="delete-entry" data-delete="${escapeHTML(entry.date)}|${escapeHTML(entry.type)}" aria-label="Delete ${escapeHTML(labels[entry.type]||"Workout")} session">×</button></span></div>`;
   }).join('');
 }
 function escapeHTML(value) {
@@ -143,7 +143,7 @@ document.getElementById('dailyChecklist').addEventListener('change',e=>{
 function exerciseNotice(message){const el=document.getElementById('exerciseMessage');if(el)el.textContent=message;}
 function renderExercises(){
  const entries=Array.isArray(dayData().exercises)?dayData().exercises:[];
- document.getElementById('exerciseList').innerHTML=entries.map((e,i)=>`<div class="exercise-entry"><div><strong>${escapeHTML(e.name)}</strong><small>${labels[e.type]||'Workout'}</small></div><span class="exercise-values">${e.sets||0} sets × ${e.reps||0} reps${e.weight!==''?' · '+escapeHTML(String(e.weight))+' lb':''}</span><button type="button" data-remove-exercise="${i}" aria-label="Remove exercise">×</button></div>`).join('');
+ document.getElementById('exerciseList').innerHTML=entries.map((e,i)=>`<div class="exercise-entry"><div><strong>${escapeHTML(e.name)}</strong><small>${escapeHTML(labels[e.type]||'Workout')}</small></div><span class="exercise-values">${escapeHTML(e.sets||0)} sets × ${escapeHTML(e.reps||0)} reps${e.weight!==''?' · '+escapeHTML(String(e.weight))+' lb':''}</span><button type="button" data-remove-exercise="${i}" aria-label="Remove exercise">×</button></div>`).join('');
 }
 document.getElementById('exerciseForm').addEventListener('submit',e=>{
  e.preventDefault();if(selectedDate>dateKey(new Date())){alert('Choose today or an earlier date.');return;}
@@ -232,7 +232,7 @@ function renderWeight(){
  document.getElementById('weightProgressBar').style.width=pct+'%';
  document.getElementById('weightProgressLabel').textContent=distance>0&&latest!==null?`${Math.round(pct)}% toward goal`:distance>0?'Log a weigh-in to begin':'Set a lower goal weight to begin';
  const history=document.getElementById('weighHistory');
- history.innerHTML=sorted.length?sorted.slice().reverse().map(([date,val])=>`<div class="weight-history-row"><span>${formatDate(date)}</span><strong>${Number(val)} ${weightData.unit}</strong><button type="button" data-remove-weight="${date}" aria-label="Delete weigh-in from ${date}">×</button></div>`).join(''):'<p class="weight-empty">No weigh-ins yet. Log your first weight above.</p>';
+ history.innerHTML=sorted.length?sorted.slice().reverse().map(([date,val])=>`<div class="weight-history-row"><span>${formatDate(date)}</span><strong>${Number(val)} ${weightData.unit}</strong><button type="button" data-remove-weight="${escapeHTML(date)}" aria-label="Delete weigh-in from ${escapeHTML(date)}">×</button></div>`).join(''):'<p class="weight-empty">No weigh-ins yet. Log your first weight above.</p>';
  const chart=document.getElementById('weightChart');
  if(sorted.length<2){chart.textContent='Log at least two weigh-ins to see your trend.';return;}
  const values=sorted.map(([,v])=>Number(v)),lo=Math.min(...values),hi=Math.max(...values),pad=Math.max(1,(hi-lo)*.2),min=lo-pad,max=hi+pad;
