@@ -67,3 +67,7 @@
 
 /* Phase 2.3B */
 .p23b-preferences{margin-top:1rem}.p23b-preferences .p23-check{display:flex;gap:.6rem;align-items:center;margin:.6rem 0}.p23b-portion{display:flex;gap:.35rem;align-items:center;font-size:.85rem;margin-top:.45rem}.p23b-portion select{max-width:6rem} 
+
+#accountCard [hidden]{display:none!important}
+#accountCard form label{display:block;margin:8px 0}
+#accountCard button{margin:4px 4px 4px 0}
